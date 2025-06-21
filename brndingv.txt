@@ -1,0 +1,1193 @@
+"use client"
+
+import React from "react"
+import {
+  FiSettings,
+  FiStar,
+  FiMessageSquare,
+  FiKey,
+  FiGlobe,
+  FiPackage,
+  FiDollarSign,
+  FiUsers,
+  FiGift,
+  FiPalette,
+} from "react-icons/fi"
+import "./Settings.css"
+import AccountSection from "./AllSettingsPages/Account/Account"
+import PrivacySettings from "./AllSettingsPages/Privacy/Privacy"
+import DefaultSettings from "./AllSettingsPages/DefaultSetting/DefaultSetting"
+import RatingSettings from "./AllSettingsPages/RatingSetting/RatingSetting"
+import CustomBranding from "./AllSettingsPages/CustomBranding/CustomBranding"
+import PageTitle from "../../../layouts/PageTitle"
+
+const AccountSettings = () => {
+  const [selectedMenu, setSelectedMenu] = React.useState("Settings")
+
+  function renderSection() {
+    if (selectedMenu === "Settings") {
+      return <AccountSection />
+    } else if (selectedMenu === "Privacy & GDPR") {
+      return <PrivacySettings />
+    } else if (selectedMenu === "Default Setting") {
+      return <DefaultSettings />
+    } else if (selectedMenu === "Rating Settings") {
+      return <RatingSettings />
+    } else if (selectedMenu === "Custom Branding") {
+      return <CustomBranding />
+    } else {
+      return <div>Select a menu item to view details.</div>
+    }
+  }
+
+  const menuItems = [
+    { icon: <FiSettings />, label: "Settings" },
+    { icon: <FiStar />, label: "Privacy & GDPR" },
+    { icon: <FiMessageSquare />, label: "Default Setting" },
+    { icon: <FiKey />, label: "Rating Settings" },
+    { icon: <FiPalette />, label: "Custom Branding" },
+    { icon: <FiGlobe />, label: "Custom Domains" },
+    { icon: <FiPackage />, label: "Integrations" },
+    { icon: <FiKey />, label: "API Keys" },
+    { icon: <FiPackage />, label: "Webhooks" },
+    { icon: <FiDollarSign />, label: "Plan & Usage" },
+    { icon: <FiDollarSign />, label: "Billing" },
+    { icon: <FiUsers />, label: "Team Management" },
+    { icon: <FiPackage />, label: "Upgrade" },
+    { icon: <FiGift />, label: "Referral Program" },
+  ]
+
+  return (
+    <div>
+      <PageTitle activeMenu="Settings" motherMenu="Home" />
+
+      <div className="AccountSettingUI-settings-container">
+        <div className="AccountSettingUI-settings-content">
+          <div className="AccountSettingUI-settings-main">
+            <div className="AccountSettingUI-settings-menu">
+              <nav>
+                {menuItems.map((item) => (
+                  <button
+                    key={item.label}
+                    onClick={() => setSelectedMenu(item.label)}
+                    className={`AccountSettingUI-menu-item ${selectedMenu === item.label ? "AccountSettingUI-active" : ""}`}
+                  >
+                    <span className="AccountSettingUI-menu-icon">{item.icon}</span>
+                    {item.label}
+                  </button>
+                ))}
+              </nav>
+            </div>
+            <div id="SectionsContainer" className="AccountSettingUI-settings-details">
+              {renderSection()}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default AccountSettings
+parent
+
+"use client"
+
+import { useState, useEffect } from "react"
+import { FiPlus, FiEdit, FiTrash2 } from "react-icons/fi"
+import BrandingModal from "./BrandingModal"
+import "./CustomBranding.css"
+
+const CustomBranding = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [brandings, setBrandings] = useState([])
+  const [editingBranding, setEditingBranding] = useState(null)
+  const [currentUser, setCurrentUser] = useState(null)
+
+  useEffect(() => {
+    // Get current user from localStorage or your auth system
+    const userData = localStorage.getItem("currentUser")
+    if (userData) {
+      setCurrentUser(JSON.parse(userData))
+      fetchUserBrandings(JSON.parse(userData).userId)
+    }
+  }, [])
+
+  const fetchUserBrandings = async (userId) => {
+    try {
+      const response = await fetch("/api/users/GetUserByUserId", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId }),
+      })
+
+      const data = await response.json()
+      if (data.User && data.User.customBrandings) {
+        setBrandings(data.User.customBrandings)
+      }
+    } catch (error) {
+      console.error("Error fetching user brandings:", error)
+    }
+  }
+
+  const handleCreateNew = () => {
+    setEditingBranding(null)
+    setIsModalOpen(true)
+  }
+
+  const handleEdit = (branding) => {
+    setEditingBranding(branding)
+    setIsModalOpen(true)
+  }
+
+  const handleDelete = async (brandingId) => {
+    if (window.confirm("Are you sure you want to delete this branding?")) {
+      try {
+        const updatedBrandings = brandings.filter((b) => b.id !== brandingId)
+
+        const response = await fetch("/api/users/UpdateUser", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            _id: currentUser._id,
+            customBrandings: updatedBrandings,
+          }),
+        })
+
+        if (response.ok) {
+          setBrandings(updatedBrandings)
+        }
+      } catch (error) {
+        console.error("Error deleting branding:", error)
+      }
+    }
+  }
+
+  const handleSaveBranding = async (brandingData) => {
+    try {
+      let updatedBrandings
+
+      if (editingBranding) {
+        // Update existing branding
+        updatedBrandings = brandings.map((b) =>
+          b.id === editingBranding.id ? { ...brandingData, id: editingBranding.id } : b,
+        )
+      } else {
+        // Add new branding
+        const newBranding = {
+          ...brandingData,
+          id: Date.now().toString(),
+          createdAt: new Date().toISOString(),
+        }
+        updatedBrandings = [...brandings, newBranding]
+      }
+
+      const response = await fetch("/api/users/UpdateUser", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          _id: currentUser._id,
+          customBrandings: updatedBrandings,
+        }),
+      })
+
+      if (response.ok) {
+        setBrandings(updatedBrandings)
+        setIsModalOpen(false)
+      }
+    } catch (error) {
+      console.error("Error saving branding:", error)
+    }
+  }
+
+  return (
+    <div className="CustomBrandingUI-container">
+      <div className="CustomBrandingUI-header">
+        <h2>Custom Brandings</h2>
+        <p className="CustomBrandingUI-description">
+          Create themes with a custom logo, button colors, and company name to use on your interviews.
+        </p>
+      </div>
+
+      <div className="CustomBrandingUI-content">
+        <button className="CustomBrandingUI-create-branding-btn" onClick={handleCreateNew}>
+          <FiPlus className="CustomBrandingUI-btn-icon" />
+          Create New Branding
+        </button>
+
+        {brandings.length > 0 && (
+          <div className="CustomBrandingUI-brandings-grid">
+            {brandings.map((branding) => (
+              <div key={branding.id} className="CustomBrandingUI-branding-card">
+                <div className="CustomBrandingUI-branding-preview">
+                  <div className="CustomBrandingUI-preview-header" style={{ backgroundColor: branding.brandColor }}>
+                    {branding.logoUrl && (
+                      <img
+                        src={branding.logoUrl || "/placeholder.svg"}
+                        alt="Brand Logo"
+                        className="CustomBrandingUI-preview-logo"
+                      />
+                    )}
+                    <span className="CustomBrandingUI-preview-company-name">{branding.companyName}</span>
+                  </div>
+                  <div className="CustomBrandingUI-preview-content">
+                    <h4>{branding.interviewTitle}</h4>
+                    <button className="CustomBrandingUI-preview-btn" style={{ backgroundColor: branding.brandColor }}>
+                      Start Interview
+                    </button>
+                  </div>
+                </div>
+
+                <div className="CustomBrandingUI-branding-actions">
+                  <button
+                    className="CustomBrandingUI-action-btn CustomBrandingUI-edit-btn"
+                    onClick={() => handleEdit(branding)}
+                  >
+                    <FiEdit />
+                  </button>
+                  <button
+                    className="CustomBrandingUI-action-btn CustomBrandingUI-delete-btn"
+                    onClick={() => handleDelete(branding.id)}
+                  >
+                    <FiTrash2 />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {isModalOpen && (
+        <BrandingModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSave={handleSaveBranding}
+          editingBranding={editingBranding}
+        />
+      )}
+    </div>
+  )
+}
+
+export default CustomBranding
+Chield
+
+"use client"
+
+import { useState, useEffect, useRef } from "react"
+import { FiX, FiUpload } from "react-icons/fi"
+import "./BrandingModal.css"
+
+const BrandingModal = ({ isOpen, onClose, onSave, editingBranding }) => {
+  const [formData, setFormData] = useState({
+    companyName: "",
+    interviewTitle: "",
+    brandColor: "#5563FF",
+    logoUrl: "",
+    logoFile: null,
+  })
+  const [isSaving, setIsSaving] = useState(false)
+  const fileInputRef = useRef(null)
+
+  useEffect(() => {
+    if (editingBranding) {
+      setFormData({
+        companyName: editingBranding.companyName || "",
+        interviewTitle: editingBranding.interviewTitle || "",
+        brandColor: editingBranding.brandColor || "#5563FF",
+        logoUrl: editingBranding.logoUrl || "",
+        logoFile: null,
+      })
+    } else {
+      setFormData({
+        companyName: "",
+        interviewTitle: "",
+        brandColor: "#5563FF",
+        logoUrl: "",
+        logoFile: null,
+      })
+    }
+  }, [editingBranding])
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
+
+  const handleColorChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      brandColor: e.target.value,
+    }))
+  }
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      // Create a preview URL
+      const previewUrl = URL.createObjectURL(file)
+      setFormData((prev) => ({
+        ...prev,
+        logoFile: file,
+        logoUrl: previewUrl,
+      }))
+    }
+  }
+
+  const handleFileUpload = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleSave = async () => {
+    setIsSaving(true)
+
+    try {
+      let logoUrl = formData.logoUrl
+
+      // If there's a new file, you would upload it to your server/cloud storage here
+      if (formData.logoFile && !formData.logoUrl.startsWith("blob:")) {
+        // This is where you'd implement actual file upload
+        // For now, we'll use the blob URL (in production, upload to your server)
+        logoUrl = formData.logoUrl
+      }
+
+      const brandingData = {
+        companyName: formData.companyName,
+        interviewTitle: formData.interviewTitle,
+        brandColor: formData.brandColor,
+        logoUrl: logoUrl,
+      }
+
+      await onSave(brandingData)
+    } catch (error) {
+      console.error("Error saving branding:", error)
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  if (!isOpen) return null
+
+  return (
+    <div className="BrandingModalUI-modal-overlay">
+      <div className="BrandingModalUI-modal">
+        <div className="BrandingModalUI-modal-header">
+          <h3>
+            <FiUpload className="BrandingModalUI-modal-icon" />
+            New Branding ({editingBranding ? "Edit" : "1"})
+          </h3>
+          <button className="BrandingModalUI-close-btn" onClick={onClose}>
+            <FiX />
+          </button>
+        </div>
+
+        <div className="BrandingModalUI-modal-content">
+          <p className="BrandingModalUI-modal-description">
+            Upload a company logo, set a primary color and set a custom company name for this brand
+          </p>
+
+          <div className="BrandingModalUI-modal-body">
+            <div className="BrandingModalUI-form-section">
+              <div className="BrandingModalUI-form-group">
+                <label htmlFor="companyName">Custom Company Name</label>
+                <div className="BrandingModalUI-input-group">
+                  <span className="BrandingModalUI-input-label">Enable</span>
+                  <input
+                    type="text"
+                    id="companyName"
+                    name="companyName"
+                    value={formData.companyName}
+                    onChange={handleInputChange}
+                    placeholder="Hireflix"
+                  />
+                </div>
+              </div>
+
+              <div className="BrandingModalUI-form-group">
+                <label htmlFor="interviewTitle">Custom Interview Title</label>
+                <div className="BrandingModalUI-input-group">
+                  <span className="BrandingModalUI-input-label">Enable</span>
+                  <input
+                    type="text"
+                    id="interviewTitle"
+                    name="interviewTitle"
+                    value={formData.interviewTitle}
+                    onChange={handleInputChange}
+                    placeholder="E.g. Technical Assessment"
+                  />
+                </div>
+              </div>
+
+              <div className="BrandingModalUI-form-row">
+                <div className="BrandingModalUI-form-group">
+                  <label>Brand logo</label>
+                  <div className="BrandingModalUI-file-upload-area" onClick={handleFileUpload}>
+                    {formData.logoUrl ? (
+                      <img
+                        src={formData.logoUrl || "/placeholder.svg"}
+                        alt="Logo preview"
+                        className="BrandingModalUI-logo-preview"
+                      />
+                    ) : (
+                      <>
+                        <FiUpload className="BrandingModalUI-upload-icon" />
+                        <span>Choose a file...</span>
+                      </>
+                    )}
+                  </div>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileSelect}
+                    accept="image/*"
+                    style={{ display: "none" }}
+                  />
+                </div>
+
+                <div className="BrandingModalUI-form-group">
+                  <label>Brand color</label>
+                  <div className="BrandingModalUI-color-picker-container">
+                    <div
+                      className="BrandingModalUI-color-preview"
+                      style={{ backgroundColor: formData.brandColor }}
+                    ></div>
+                    <input
+                      type="color"
+                      value={formData.brandColor}
+                      onChange={handleColorChange}
+                      className="BrandingModalUI-color-input"
+                    />
+                    <span className="BrandingModalUI-color-value">{formData.brandColor}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="BrandingModalUI-logo-tips">
+                <h4>How to make your logo look better:</h4>
+                <ul>
+                  <li>
+                    The image should be at least <strong>360px wide</strong> and suitable for a white background.
+                  </li>
+                  <li>
+                    A <strong>horizontal version</strong> of your logo is preferred if available.
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="BrandingModalUI-preview-section">
+              <h4>Preview</h4>
+              <div className="BrandingModalUI-preview-container">
+                <div className="BrandingModalUI-preview-card">
+                  <div className="BrandingModalUI-preview-header">
+                    {formData.logoUrl && (
+                      <img
+                        src={formData.logoUrl || "/placeholder.svg"}
+                        alt="Logo"
+                        className="BrandingModalUI-preview-logo"
+                      />
+                    )}
+                    <span className="BrandingModalUI-preview-company">{formData.companyName || "Hireflix"}</span>
+                  </div>
+                  <div className="BrandingModalUI-preview-body">
+                    <h3>Video Interview</h3>
+                    <p>{formData.interviewTitle || "(Position Title) - aec"}</p>
+                    <button
+                      className="BrandingModalUI-preview-start-btn"
+                      style={{ backgroundColor: formData.brandColor }}
+                    >
+                      Start Interview
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="BrandingModalUI-modal-footer">
+          <button className="BrandingModalUI-save-btn" onClick={handleSave} disabled={isSaving}>
+            {isSaving ? "Saving..." : "Saved"}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default BrandingModal
+chields model
+
+
+.AccountSettingUI-settings-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.AccountSettingUI-settings-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.AccountSettingUI-settings-main {
+  display: flex;
+  min-height: 600px;
+}
+
+.AccountSettingUI-settings-menu {
+  width: 280px;
+  background: #f8f9fa;
+  border-right: 1px solid #e1e5e9;
+  padding: 20px 0;
+}
+
+.AccountSettingUI-settings-menu nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.AccountSettingUI-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border: none;
+  background: none;
+  text-align: left;
+  font-size: 14px;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-radius: 0;
+}
+
+.AccountSettingUI-menu-item:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.AccountSettingUI-menu-item.AccountSettingUI-active {
+  background: #3b82f6;
+  color: white;
+  font-weight: 500;
+}
+
+.AccountSettingUI-menu-icon {
+  font-size: 16px;
+  min-width: 16px;
+}
+
+.AccountSettingUI-settings-details {
+  flex: 1;
+  padding: 0;
+  overflow-y: auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .AccountSettingUI-settings-main {
+    flex-direction: column;
+  }
+
+  .AccountSettingUI-settings-menu {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #e1e5e9;
+  }
+
+  .AccountSettingUI-settings-menu nav {
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 0 10px;
+  }
+
+  .AccountSettingUI-menu-item {
+    white-space: nowrap;
+    min-width: fit-content;
+  }
+}
+parent css
+
+.CustomBrandingUI-container {
+  padding: 24px;
+  max-width: 1200px;
+}
+
+.CustomBrandingUI-header {
+  margin-bottom: 32px;
+}
+
+.CustomBrandingUI-header h2 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.CustomBrandingUI-description {
+  font-size: 16px;
+  color: #666;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.CustomBrandingUI-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.CustomBrandingUI-create-branding-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background-color: #5563ff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  align-self: flex-start;
+}
+
+.CustomBrandingUI-create-branding-btn:hover {
+  background-color: #4451e6;
+}
+
+.CustomBrandingUI-btn-icon {
+  font-size: 18px;
+}
+
+.CustomBrandingUI-brandings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.CustomBrandingUI-branding-card {
+  border: 1px solid #e1e5e9;
+  border-radius: 12px;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.CustomBrandingUI-branding-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.CustomBrandingUI-branding-preview {
+  padding: 16px;
+}
+
+.CustomBrandingUI-preview-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  color: white;
+}
+
+.CustomBrandingUI-preview-logo {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  background: white;
+  border-radius: 4px;
+  padding: 4px;
+}
+
+.CustomBrandingUI-preview-company-name {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.CustomBrandingUI-preview-content h4 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #1a1a1a;
+}
+
+.CustomBrandingUI-preview-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.CustomBrandingUI-branding-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid #f0f0f0;
+  background: #fafafa;
+}
+
+.CustomBrandingUI-action-btn {
+  padding: 8px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.CustomBrandingUI-edit-btn {
+  background: #f0f9ff;
+  color: #0369a1;
+}
+
+.CustomBrandingUI-edit-btn:hover {
+  background: #e0f2fe;
+}
+
+.CustomBrandingUI-delete-btn {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.CustomBrandingUI-delete-btn:hover {
+  background: #fee2e2;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .CustomBrandingUI-container {
+    padding: 16px;
+  }
+
+  .CustomBrandingUI-brandings-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .CustomBrandingUI-header h2 {
+    font-size: 24px;
+  }
+
+  .CustomBrandingUI-description {
+    font-size: 14px;
+  }
+}
+child css
+
+
+.BrandingModalUI-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.BrandingModalUI-modal {
+  background: white;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.BrandingModalUI-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.BrandingModalUI-modal-header h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.BrandingModalUI-modal-icon {
+  font-size: 20px;
+  color: #6b7280;
+}
+
+.BrandingModalUI-close-btn {
+  padding: 8px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 6px;
+  color: #6b7280;
+  transition: background-color 0.2s;
+}
+
+.BrandingModalUI-close-btn:hover {
+  background: #f3f4f6;
+}
+
+.BrandingModalUI-modal-content {
+  padding: 24px;
+}
+
+.BrandingModalUI-modal-description {
+  color: #6b7280;
+  font-size: 14px;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.BrandingModalUI-modal-body {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 32px;
+}
+
+.BrandingModalUI-form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.BrandingModalUI-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.BrandingModalUI-form-group label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.BrandingModalUI-input-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.BrandingModalUI-input-label {
+  font-size: 12px;
+  color: #9ca3af;
+  min-width: 50px;
+}
+
+.BrandingModalUI-input-group input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.BrandingModalUI-input-group input:focus {
+  outline: none;
+  border-color: #5563ff;
+  box-shadow: 0 0 0 3px rgba(85, 99, 255, 0.1);
+}
+
+.BrandingModalUI-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.BrandingModalUI-file-upload-area {
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.BrandingModalUI-file-upload-area:hover {
+  border-color: #5563ff;
+}
+
+.BrandingModalUI-upload-icon {
+  font-size: 24px;
+  color: #9ca3af;
+}
+
+.BrandingModalUI-logo-preview {
+  max-width: 100px;
+  max-height: 60px;
+  object-fit: contain;
+}
+
+.BrandingModalUI-color-picker-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.BrandingModalUI-color-preview {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #e5e7eb;
+}
+
+.BrandingModalUI-color-input {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.BrandingModalUI-color-value {
+  font-size: 14px;
+  color: #6b7280;
+  font-family: monospace;
+}
+
+.BrandingModalUI-logo-tips {
+  background: #f9fafb;
+  padding: 16px;
+  border-radius: 8px;
+  border-left: 4px solid #5563ff;
+}
+
+.BrandingModalUI-logo-tips h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 8px 0;
+}
+
+.BrandingModalUI-logo-tips ul {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.BrandingModalUI-logo-tips li {
+  margin-bottom: 4px;
+}
+
+.BrandingModalUI-preview-section h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 16px;
+}
+
+.BrandingModalUI-preview-container {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  background: #f9fafb;
+}
+
+.BrandingModalUI-preview-card {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.BrandingModalUI-preview-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #5563ff;
+  color: white;
+}
+
+.BrandingModalUI-preview-logo {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  background: white;
+  border-radius: 4px;
+  padding: 2px;
+}
+
+.BrandingModalUI-preview-company {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.BrandingModalUI-preview-body {
+  padding: 20px;
+  text-align: center;
+}
+
+.BrandingModalUI-preview-body h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+}
+
+.BrandingModalUI-preview-body p {
+  color: #6b7280;
+  font-size: 14px;
+  margin: 0 0 16px 0;
+}
+
+.BrandingModalUI-preview-start-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.BrandingModalUI-modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.BrandingModalUI-save-btn {
+  padding: 10px 24px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.BrandingModalUI-save-btn:hover:not(:disabled) {
+  background: #059669;
+}
+
+.BrandingModalUI-save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .BrandingModalUI-modal-body {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .BrandingModalUI-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .BrandingModalUI-modal {
+    margin: 10px;
+    max-width: calc(100vw - 20px);
+  }
+
+  .BrandingModalUI-modal-content {
+    padding: 16px;
+  }
+
+  .BrandingModalUI-modal-header {
+    padding: 16px;
+  }
+
+  .BrandingModalUI-modal-footer {
+    padding: 12px 16px;
+  }
+}
+child model css
+
+
+const mongoose = require("mongoose")
+
+// Define the Custom Branding Schema
+const customBrandingSchema = new mongoose.Schema({
+  id: { type: String, required: true },
+  companyName: { type: String, required: true },
+  interviewTitle: { type: String, required: true },
+  brandColor: { type: String, default: "#5563FF" },
+  logoUrl: { type: String },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
+})
+
+// Define the User Schema
+const userSchema = new mongoose.Schema(
+  {
+    userId: {
+      type: String,
+    },
+    userName: {
+      type: String,
+    },
+    companyName: {
+      type: String,
+    },
+    companyEmail: {
+      type: String,
+    },
+    companyLocation: {
+      type: String,
+    },
+    companyEmailPassword: {
+      type: String,
+    },
+    otp: { type: String },
+    otpExpiry: { type: Date },
+    Status: { type: String },
+    Limit: { type: Number },
+    Plan: { type: String },
+    CreatedInterviews: { type: Number },
+    customBrandings: [customBrandingSchema], // Add this field for custom brandings
+  },
+  {
+    timestamps: true,
+  },
+)
+
+module.exports = mongoose.model("User", userSchema)
+updates schema
