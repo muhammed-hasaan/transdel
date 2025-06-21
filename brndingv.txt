@@ -1,85 +1,522 @@
 "use client"
+import "./Step1.css"
 
-import React from "react"
-import {
-  FiSettings,
-  FiStar,
-  FiMessageSquare,
-  FiKey,
-  FiGlobe,
-  FiPackage,
-  FiDollarSign,
-  FiUsers,
-  FiGift,
-  FiPalette,
-} from "react-icons/fi"
-import "./Settings.css"
-import AccountSection from "./AllSettingsPages/Account/Account"
-import PrivacySettings from "./AllSettingsPages/Privacy/Privacy"
-import DefaultSettings from "./AllSettingsPages/DefaultSetting/DefaultSetting"
-import RatingSettings from "./AllSettingsPages/RatingSetting/RatingSetting"
-import CustomBranding from "./AllSettingsPages/CustomBranding/CustomBranding"
-import PageTitle from "../../../layouts/PageTitle"
-
-const AccountSettings = () => {
-  const [selectedMenu, setSelectedMenu] = React.useState("Settings")
-
-  function renderSection() {
-    if (selectedMenu === "Settings") {
-      return <AccountSection />
-    } else if (selectedMenu === "Privacy & GDPR") {
-      return <PrivacySettings />
-    } else if (selectedMenu === "Default Setting") {
-      return <DefaultSettings />
-    } else if (selectedMenu === "Rating Settings") {
-      return <RatingSettings />
-    } else if (selectedMenu === "Custom Branding") {
-      return <CustomBranding />
-    } else {
-      return <div>Select a menu item to view details.</div>
-    }
+const Step1 = (props) => {
+  const handleThinkingTimeChange = (e) => {
+    props.candidateThinkingTime(e.target.value)
   }
 
-  const menuItems = [
-    { icon: <FiSettings />, label: "Settings" },
-    { icon: <FiStar />, label: "Privacy & GDPR" },
-    { icon: <FiMessageSquare />, label: "Default Setting" },
-    { icon: <FiKey />, label: "Rating Settings" },
-    { icon: <FiPalette />, label: "Custom Branding" },
-    { icon: <FiGlobe />, label: "Custom Domains" },
-    { icon: <FiPackage />, label: "Integrations" },
-    { icon: <FiKey />, label: "API Keys" },
-    { icon: <FiPackage />, label: "Webhooks" },
-    { icon: <FiDollarSign />, label: "Plan & Usage" },
-    { icon: <FiDollarSign />, label: "Billing" },
-    { icon: <FiUsers />, label: "Team Management" },
-    { icon: <FiPackage />, label: "Upgrade" },
-    { icon: <FiGift />, label: "Referral Program" },
-  ]
+  const handleMaxAnswerLengthChange = (e) => {
+    props.candidateMaxAnswerLength(e.target.value)
+  }
+
+  const handleBrandingChange = (e) => {
+    props.brandingColorOrLogo(e.target.value)
+  }
+
+  const handleRetakesChange = (e) => {
+    props.answerRetakesAllowed(e.target.value)
+  }
+
+  // Notification handlers
+  const handleNotificationChange = (type, field, value) => {
+    props.setCandidateNotifications((prev) => ({
+      ...prev,
+      [type]: {
+        ...prev[type],
+        [field]: value,
+      },
+    }))
+  }
 
   return (
-    <div>
-      <PageTitle activeMenu="Settings" motherMenu="Home" />
-
-      <div className="AccountSettingUI-settings-container">
-        <div className="AccountSettingUI-settings-content">
-          <div className="AccountSettingUI-settings-main">
-            <div className="AccountSettingUI-settings-menu">
-              <nav>
-                {menuItems.map((item) => (
-                  <button
-                    key={item.label}
-                    onClick={() => setSelectedMenu(item.label)}
-                    className={`AccountSettingUI-menu-item ${selectedMenu === item.label ? "AccountSettingUI-active" : ""}`}
-                  >
-                    <span className="AccountSettingUI-menu-icon">{item.icon}</span>
-                    {item.label}
-                  </button>
-                ))}
-              </nav>
+    <div className="listandcreateinterviewsstep1-flex">
+      <div style={{ paddingLeft: "25px" }}>
+        <button
+          onClick={props.prevStep}
+          className="listandcreateinterviewsstep1-video-interview-create-button"
+          style={{ marginBottom: "20px" }}
+        >
+          Back
+        </button>
+      </div>
+      <div
+        style={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <div className="listandcreateinterviewsstep1-video-interview-container" style={{ maxWidth: "96.3%" }}>
+          <div className="listandcreateinterviewsstep1-video-interview-section">
+            <div className="listandcreateinterviewsstep1-video-interview-left">
+              <div className="listandcreateinterviewsstep1-video-interview-placeholder-image">
+                <div className="listandcreateinterviewsstep1-video-icon">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M14.7295 2H9.26953V6H14.7295V2Z" fill="currentColor" />
+                    <path d="M16.7295 8V6H14.7295V8H16.7295Z" fill="currentColor" />
+                    <path d="M16.7295 8H18.7295V16H16.7295V8Z" fill="currentColor" />
+                    <path d="M14.7295 18V16H9.26953V18H14.7295Z" fill="currentColor" />
+                    <path d="M7.26953 16V8H9.26953V6H7.26953V8H5.26953V16H7.26953Z" fill="currentColor" />
+                    <path d="M12 10L15 12.5L12 15V10Z" fill="white" />
+                  </svg>
+                </div>
+              </div>
+              <div className="listandcreateinterviewsstep1-content-wrapper">
+                <h2 className="listandcreateinterviewsstep1-main-title">Video Interview Setup</h2>
+                <p className="listandcreateinterviewsstep1-main-description">
+                  Set up your interview and create a great candidate experience.
+                </p>
+                <button className="listandcreateinterviewsstep1-video-interview-create-button" onClick={props.nextStep}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M12 5V19M5 12H19"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  Create Interview
+                </button>
+              </div>
             </div>
-            <div id="SectionsContainer" className="AccountSettingUI-settings-details">
-              {renderSection()}
+
+            <div className="listandcreateinterviewsstep1-video-interview-right">
+              <div className="listandcreateinterviewsstep1-settings-header">
+                <h3>Interview Settings</h3>
+              </div>
+
+              <div className="listandcreateinterviewsstep1-video-interview-setting-item">
+                <div className="listandcreateinterviewsstep1-setting-info">
+                  <span>Thinking Time</span>
+                  <small>Time to prepare answer</small>
+                </div>
+                <select
+                  className="listandcreateinterviewsstep1-setting-select"
+                  onChange={handleThinkingTimeChange}
+                  value={props.candidateThinkingTimeValue}
+                >
+                  <option value="" disabled>
+                    Thinking Time
+                  </option>
+                  <option value="30 seconds">30 seconds</option>
+                  <option value="1 minute">1 minute</option>
+                  <option value="2 minutes">2 minutes</option>
+                  <option value="3 minutes">3 minutes</option>
+                  <option value="4 minutes">4 minutes</option>
+                  <option value="5 minutes">5 minutes</option>
+                </select>
+              </div>
+
+              <div className="listandcreateinterviewsstep1-video-interview-setting-item">
+                <div className="listandcreateinterviewsstep1-setting-info">
+                  <span>Answer Length</span>
+                  <small>Max recording time</small>
+                </div>
+                <select
+                  className="listandcreateinterviewsstep1-setting-select"
+                  onChange={handleMaxAnswerLengthChange}
+                  value={props.candidateMaxAnswerLengthValue}
+                >
+                  <option value="" disabled>
+                    Answer Length
+                  </option>
+                  <option value="1 minute">1 minute</option>
+                  <option value="2 minutes">2 minutes</option>
+                  <option value="3 minutes">3 minutes</option>
+                  <option value="4 minutes">4 minutes</option>
+                  <option value="5 minutes">5 minutes</option>
+                </select>
+              </div>
+
+              <div className="listandcreateinterviewsstep1-video-interview-setting-item">
+                <div className="listandcreateinterviewsstep1-setting-info">
+                  <span>Branding</span>
+                  <small>Custom appearance</small>
+                </div>
+                <select
+                  className="listandcreateinterviewsstep1-setting-select"
+                  onChange={handleBrandingChange}
+                  value={props.brandingColorOrLogoValue}
+                >
+                  <option value="" disabled>
+                    Branding
+                  </option>
+                  <option value="No">No</option>
+                  <option value="Logo">Logo</option>
+                  <option value="Color">Color</option>
+                </select>
+              </div>
+
+              <div className="listandcreateinterviewsstep1-video-interview-setting-item">
+                <div className="listandcreateinterviewsstep1-setting-info">
+                  <span>Retakes</span>
+                  <small>Allow re-recording</small>
+                </div>
+                <select
+                  className="listandcreateinterviewsstep1-setting-select"
+                  onChange={handleRetakesChange}
+                  value={props.answerRetakesAllowedValue}
+                >
+                  <option value="" disabled>
+                    Retakes
+                  </option>
+                  <option value="None">None</option>
+                  <option value="Allowed">Allowed</option>
+                  <option value="Not Allowed">Not Allowed</option>
+                </select>
+              </div>
+
+              {/* Candidate Notifications Section */}
+              <div
+                style={{
+                  marginTop: "30px",
+                  padding: "20px",
+                  backgroundColor: "#f8f9fa",
+                  borderRadius: "8px",
+                  border: "1px solid #e9ecef",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: "15px",
+                  }}
+                >
+                  <h3
+                    style={{
+                      fontSize: "16px",
+                      fontWeight: "600",
+                      color: "#333",
+                      margin: 0,
+                    }}
+                  >
+                    Candidate Notifications
+                  </h3>
+                  <button
+                    style={{
+                      fontSize: "12px",
+                      color: "#007bff",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      textDecoration: "underline",
+                    }}
+                  >
+                    Edit templates
+                  </button>
+                </div>
+
+                <p
+                  style={{
+                    fontSize: "13px",
+                    color: "#666",
+                    marginBottom: "20px",
+                    margin: "0 0 20px 0",
+                  }}
+                >
+                  Automatically notify candidates by email and/or SMS when inviting them to the position
+                </p>
+
+                {/* Invitation Notification */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginBottom: "15px",
+                    padding: "10px 0",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    <span style={{ fontSize: "14px", fontWeight: "500", minWidth: "60px" }}>Send</span>
+                    <select
+                      style={{
+                        padding: "5px 10px",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                        fontSize: "13px",
+                        minWidth: "80px",
+                      }}
+                      value={props.candidateNotifications?.invitation?.method || "Email"}
+                      onChange={(e) => handleNotificationChange("invitation", "method", e.target.value)}
+                    >
+                      <option value="Email">Email</option>
+                      <option value="SMS">SMS</option>
+                      <option value="Both">Both</option>
+                    </select>
+                    <span style={{ fontSize: "14px", minWidth: "20px" }}>to</span>
+                    <select
+                      style={{
+                        padding: "5px 10px",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                        fontSize: "13px",
+                        minWidth: "100px",
+                      }}
+                      value={props.candidateNotifications?.invitation?.recipient || "Invitation"}
+                      onChange={(e) => handleNotificationChange("invitation", "recipient", e.target.value)}
+                    >
+                      <option value="Invitation">Invitation</option>
+                      <option value="All Candidates">All Candidates</option>
+                    </select>
+                    <select
+                      style={{
+                        padding: "5px 10px",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                        fontSize: "13px",
+                        minWidth: "120px",
+                      }}
+                      value={props.candidateNotifications?.invitation?.timing || "On invitation"}
+                      onChange={(e) => handleNotificationChange("invitation", "timing", e.target.value)}
+                    >
+                      <option value="On invitation">On invitation</option>
+                      <option value="Immediately">Immediately</option>
+                      <option value="1 hour before">1 hour before</option>
+                    </select>
+                  </div>
+                  <div style={{ display: "flex", gap: "10px" }}>
+                    <button
+                      style={{
+                        width: "20px",
+                        height: "20px",
+                        border: "none",
+                        background: "none",
+                        cursor: "pointer",
+                        opacity: 0.6,
+                      }}
+                    >
+                      👁️
+                    </button>
+                    <button
+                      style={{
+                        width: "20px",
+                        height: "20px",
+                        border: "none",
+                        background: "none",
+                        cursor: "pointer",
+                        opacity: 0.6,
+                      }}
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </div>
+
+                {/* Reminder Notification */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginBottom: "15px",
+                    padding: "10px 0",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    <span style={{ fontSize: "14px", fontWeight: "500", minWidth: "60px" }}>Send</span>
+                    <select
+                      style={{
+                        padding: "5px 10px",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                        fontSize: "13px",
+                        minWidth: "80px",
+                      }}
+                      value={props.candidateNotifications?.reminder?.method || "Email"}
+                      onChange={(e) => handleNotificationChange("reminder", "method", e.target.value)}
+                    >
+                      <option value="Email">Email</option>
+                      <option value="SMS">SMS</option>
+                      <option value="Both">Both</option>
+                    </select>
+                    <span style={{ fontSize: "14px", minWidth: "20px" }}>to</span>
+                    <select
+                      style={{
+                        padding: "5px 10px",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                        fontSize: "13px",
+                        minWidth: "100px",
+                      }}
+                      value={props.candidateNotifications?.reminder?.recipient || "Reminder"}
+                      onChange={(e) => handleNotificationChange("reminder", "recipient", e.target.value)}
+                    >
+                      <option value="Reminder">Reminder</option>
+                      <option value="All Candidates">All Candidates</option>
+                    </select>
+                    <select
+                      style={{
+                        padding: "5px 10px",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                        fontSize: "13px",
+                        minWidth: "120px",
+                      }}
+                      value={props.candidateNotifications?.reminder?.timing || "If no response in 24 hours"}
+                      onChange={(e) => handleNotificationChange("reminder", "timing", e.target.value)}
+                    >
+                      <option value="If no response in 24 hours">If no response in 24 hours</option>
+                      <option value="If no response in 48 hours">If no response in 48 hours</option>
+                      <option value="If no response in 72 hours">If no response in 72 hours</option>
+                    </select>
+                  </div>
+                  <div style={{ display: "flex", gap: "10px" }}>
+                    <button
+                      style={{
+                        width: "20px",
+                        height: "20px",
+                        border: "none",
+                        background: "none",
+                        cursor: "pointer",
+                        opacity: 0.6,
+                      }}
+                    >
+                      👁️
+                    </button>
+                    <button
+                      style={{
+                        width: "20px",
+                        height: "20px",
+                        border: "none",
+                        background: "none",
+                        cursor: "pointer",
+                        opacity: 0.6,
+                      }}
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </div>
+
+                {/* Completion Notification */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginBottom: "15px",
+                    padding: "10px 0",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    <span style={{ fontSize: "14px", fontWeight: "500", minWidth: "60px" }}>Send</span>
+                    <select
+                      style={{
+                        padding: "5px 10px",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                        fontSize: "13px",
+                        minWidth: "80px",
+                      }}
+                      value={props.candidateNotifications?.completion?.method || "Email"}
+                      onChange={(e) => handleNotificationChange("completion", "method", e.target.value)}
+                    >
+                      <option value="Email">Email</option>
+                      <option value="SMS">SMS</option>
+                      <option value="Both">Both</option>
+                    </select>
+                    <span style={{ fontSize: "14px", minWidth: "20px" }}>to</span>
+                    <select
+                      style={{
+                        padding: "5px 10px",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                        fontSize: "13px",
+                        minWidth: "100px",
+                      }}
+                      value={props.candidateNotifications?.completion?.recipient || "Interview completed"}
+                      onChange={(e) => handleNotificationChange("completion", "recipient", e.target.value)}
+                    >
+                      <option value="Interview completed">Interview completed</option>
+                      <option value="All Candidates">All Candidates</option>
+                    </select>
+                    <select
+                      style={{
+                        padding: "5px 10px",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                        fontSize: "13px",
+                        minWidth: "120px",
+                      }}
+                      value={props.candidateNotifications?.completion?.timing || "On interview completion"}
+                      onChange={(e) => handleNotificationChange("completion", "timing", e.target.value)}
+                    >
+                      <option value="On interview completion">On interview completion</option>
+                      <option value="Immediately after">Immediately after</option>
+                      <option value="1 hour after">1 hour after</option>
+                    </select>
+                  </div>
+                  <div style={{ display: "flex", gap: "10px" }}>
+                    <button
+                      style={{
+                        width: "20px",
+                        height: "20px",
+                        border: "none",
+                        background: "none",
+                        cursor: "pointer",
+                        opacity: 0.6,
+                      }}
+                    >
+                      👁️
+                    </button>
+                    <button
+                      style={{
+                        width: "20px",
+                        height: "20px",
+                        border: "none",
+                        background: "none",
+                        cursor: "pointer",
+                        opacity: 0.6,
+                      }}
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </div>
+
+                {/* Add Message Button */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    marginTop: "15px",
+                    cursor: "pointer",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: "20px",
+                      height: "20px",
+                      borderRadius: "50%",
+                      backgroundColor: "#333",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "white",
+                      fontSize: "12px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    +
+                  </div>
+                  <span
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      color: "#333",
+                    }}
+                  >
+                    Add message
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -88,1106 +525,1748 @@ const AccountSettings = () => {
   )
 }
 
-export default AccountSettings
-parent
+export default Step1
+
+
+
+
 
 "use client"
-
 import { useState, useEffect } from "react"
-import { FiPlus, FiEdit, FiTrash2 } from "react-icons/fi"
-import BrandingModal from "./BrandingModal"
-import "./CustomBranding.css"
+import { FiSettings, FiTrash, FiX } from "react-icons/fi"
+import { GiPartyPopper } from "react-icons/gi"
+import { FaVideo, FaSpinner } from "react-icons/fa"
+import Swal from "sweetalert2"
+import withReactContent from "sweetalert2-react-content"
+import "./Step2.css"
+import { MdDragIndicator } from "react-icons/md"
 
-const CustomBranding = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [brandings, setBrandings] = useState([])
-  const [editingBranding, setEditingBranding] = useState(null)
-  const [currentUser, setCurrentUser] = useState(null)
+const MySwal = withReactContent(Swal)
 
+const Step2 = (props) => {
+  const [showSettingsPopup, setShowSettingsPopup] = useState(false)
+  const [currentQuestionSettings, setCurrentQuestionSettings] = useState(null)
+  const [questionSettings, setQuestionSettings] = useState({})
+  const [isPopupOpen, setIsPopupOpen] = useState(false)
+  const [previewCount, setPreviewCount] = useState(0)
+  const [draggedItem, setDraggedItem] = useState(null)
+
+  // Auto-save functionality
   useEffect(() => {
-    // Get current user from localStorage or your auth system
-    const userData = localStorage.getItem("currentUser")
-    if (userData) {
-      setCurrentUser(JSON.parse(userData))
-      fetchUserBrandings(JSON.parse(userData).userId)
+    const interviewData = {
+      interviewStartVideo: props.interviewStartVideo,
+      interviewStartTitle: props.interviewStartTitle,
+      interviewStartTag: props.interviewStartTag,
+      questions: props.questions,
+      farewell: props.farewell,
+    }
+    localStorage.setItem("interviewData", JSON.stringify(interviewData))
+  }, [props.interviewStartVideo, props.interviewStartTitle, props.interviewStartTag, props.questions, props.farewell])
+
+  // Load saved data on component mount
+  useEffect(() => {
+    const savedData = localStorage.getItem("interviewData")
+    if (savedData) {
+      const parsedData = JSON.parse(savedData)
+      if (parsedData.interviewStartTitle) props.setInterviewStartTitle(parsedData.interviewStartTitle)
+      if (parsedData.interviewStartTag) props.setInterviewStartTag(parsedData.interviewStartTag)
+      if (parsedData.questions) props.setQuestions(parsedData.questions)
+      if (parsedData.farewell) props.setFarewell(parsedData.farewell)
     }
   }, [])
 
-  const fetchUserBrandings = async (userId) => {
-    try {
-      const response = await fetch("/api/users/GetUserByUserId", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userId }),
-      })
-
-      const data = await response.json()
-      if (data.User && data.User.customBrandings) {
-        setBrandings(data.User.customBrandings)
-      }
-    } catch (error) {
-      console.error("Error fetching user brandings:", error)
-    }
+  const settingsOptions = {
+    Timetothink: [
+      { value: "30 seconds", label: "30 seconds" },
+      { value: "1 minute", label: "1 minute" },
+      { value: "2 minutes", label: "2 minutes" },
+      { value: "3 minutes", label: "3 minutes" },
+      { value: "4 minutes", label: "4 minutes" },
+      { value: "5 minutes", label: "5 minutes" },
+    ],
+    Timetoanswer: [
+      { value: "30 seconds", label: "30 seconds" },
+      { value: "1 minute", label: "1 minute" },
+      { value: "2 minutes", label: "2 minutes" },
+      { value: "3 minutes", label: "3 minutes" },
+      { value: "4 minutes", label: "4 minutes" },
+      { value: "5 minutes", label: "5 minutes" },
+    ],
+    Retakes: [
+      { value: "None", label: "None" },
+      { value: "1 Retake", label: "1 Retake" },
+      { value: "2 Retakes", label: "2 Retakes" },
+      { value: "3 Retakes", label: "3 Retakes" },
+      { value: "Unlimited", label: "Unlimited" },
+    ],
   }
 
-  const handleCreateNew = () => {
-    setEditingBranding(null)
-    setIsModalOpen(true)
-  }
+  // File handling functions
+  const handleFileSelect = (callback, multiple = false) => {
+    const input = document.createElement("input")
+    input.type = "file"
+    input.accept = "video/*"
+    input.multiple = multiple
 
-  const handleEdit = (branding) => {
-    setEditingBranding(branding)
-    setIsModalOpen(true)
-  }
-
-  const handleDelete = async (brandingId) => {
-    if (window.confirm("Are you sure you want to delete this branding?")) {
-      try {
-        const updatedBrandings = brandings.filter((b) => b.id !== brandingId)
-
-        const response = await fetch("/api/users/UpdateUser", {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            _id: currentUser._id,
-            customBrandings: updatedBrandings,
-          }),
-        })
-
-        if (response.ok) {
-          setBrandings(updatedBrandings)
-        }
-      } catch (error) {
-        console.error("Error deleting branding:", error)
+    input.onchange = (e) => {
+      const files = e.target.files
+      if (files && files.length > 0) {
+        callback(files[0])
       }
     }
+
+    input.click()
   }
 
-  const handleSaveBranding = async (brandingData) => {
-    try {
-      let updatedBrandings
+  const handleDragOver = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    e.currentTarget.classList.add("drag-over")
+  }
 
-      if (editingBranding) {
-        // Update existing branding
-        updatedBrandings = brandings.map((b) =>
-          b.id === editingBranding.id ? { ...brandingData, id: editingBranding.id } : b,
-        )
+  const handleDragLeave = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    e.currentTarget.classList.remove("drag-over")
+  }
+
+  const handleDrop = (e, callback) => {
+    e.preventDefault()
+    e.stopPropagation()
+    e.currentTarget.classList.remove("drag-over")
+
+    const files = e.dataTransfer.files
+    if (files && files.length > 0) {
+      const file = files[0]
+      if (file.type.startsWith("video/")) {
+        callback(file)
       } else {
-        // Add new branding
-        const newBranding = {
-          ...brandingData,
-          id: Date.now().toString(),
-          createdAt: new Date().toISOString(),
+        Swal.fire({
+          icon: "error",
+          title: "Invalid File Type",
+          text: "Please upload a video file.",
+        })
+      }
+    }
+  }
+
+  // Camera recording function
+  const recordVideo = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      const mediaRecorder = new MediaRecorder(stream)
+      const chunks = []
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          chunks.push(e.data)
         }
-        updatedBrandings = [...brandings, newBranding]
       }
 
-      const response = await fetch("/api/users/UpdateUser", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          _id: currentUser._id,
-          customBrandings: updatedBrandings,
-        }),
-      })
+      const video = document.createElement("video")
+      video.srcObject = stream
+      video.autoplay = true
+      video.muted = true
+      video.style.width = "100%"
+      video.style.maxHeight = "300px"
 
-      if (response.ok) {
-        setBrandings(updatedBrandings)
-        setIsModalOpen(false)
+      return new Promise((resolve, reject) => {
+        MySwal.fire({
+          title: "Recording Video",
+          html: '<div id="video-container"></div>',
+          showCancelButton: true,
+          confirmButtonText: "Start Recording",
+          cancelButtonText: "Cancel",
+          didOpen: () => {
+            const container = document.getElementById("video-container")
+            if (container) {
+              container.appendChild(video)
+            }
+          },
+          preConfirm: () => {
+            mediaRecorder.start()
+            return new Promise((innerResolve) => {
+              MySwal.fire({
+                title: "Recording in Progress...",
+                html: '<div id="recording-container"></div>',
+                showCancelButton: false,
+                confirmButtonText: "Stop Recording",
+                allowOutsideClick: false,
+                didOpen: () => {
+                  const container = document.getElementById("recording-container")
+                  if (container) {
+                    const recordingVideo = video.cloneNode()
+                    recordingVideo.srcObject = stream
+                    recordingVideo.autoplay = true
+                    recordingVideo.muted = true
+                    container.appendChild(recordingVideo)
+                  }
+                },
+                preConfirm: () => {
+                  return new Promise((stopResolve) => {
+                    mediaRecorder.onstop = () => {
+                      const blob = new Blob(chunks, { type: "video/webm" })
+                      const file = new File([blob], "recorded-video.webm", { type: "video/webm" })
+                      stream.getTracks().forEach((track) => track.stop())
+                      stopResolve(file)
+                    }
+                    mediaRecorder.stop()
+                  })
+                },
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  innerResolve(result.value)
+                }
+              })
+            })
+          },
+        }).then((result) => {
+          if (result.isConfirmed) {
+            resolve(result.value)
+          } else {
+            stream.getTracks().forEach((track) => track.stop())
+            reject(new Error("Recording cancelled"))
+          }
+        })
+      })
+    } catch (error) {
+      console.error("Camera access error:", error)
+      throw new Error("Camera access denied or not available")
+    }
+  }
+
+  // Video upload handlers
+  const handleIntroVideoUpload = async (method = "upload") => {
+    try {
+      let file
+
+      if (method === "record") {
+        file = await recordVideo()
+      } else if (method === "upload") {
+        file = await new Promise((resolve) => {
+          handleFileSelect(resolve)
+        })
+      }
+
+      if (file) {
+        props.setInterviewStartVideo(file)
       }
     } catch (error) {
-      console.error("Error saving branding:", error)
+      console.error("Error handling intro video:", error)
+      if (error.message !== "Recording cancelled") {
+        Swal.fire({
+          icon: "error",
+          title: "Upload Error",
+          text: error.message || "Failed to process video",
+        })
+      }
     }
+  }
+
+  const handleQuestionVideoUpload = async (questionId, method = "upload") => {
+    const question = props.questions.find((q) => q.id === questionId)
+    if (!question.title || !question.description) {
+      Swal.fire({
+        icon: "warning",
+        title: "Missing Information",
+        text: "Please enter question title and description first.",
+      })
+      return
+    }
+
+    try {
+      let file
+
+      if (method === "record") {
+        file = await recordVideo()
+      } else if (method === "upload") {
+        file = await new Promise((resolve) => {
+          handleFileSelect(resolve)
+        })
+      }
+
+      if (file) {
+        const updatedQuestions = props.questions.map((q) => (q.id === questionId ? { ...q, video: file } : q))
+        props.setQuestions(updatedQuestions)
+      }
+    } catch (error) {
+      console.error("Error handling question video:", error)
+      if (error.message !== "Recording cancelled") {
+        Swal.fire({
+          icon: "error",
+          title: "Upload Error",
+          text: error.message || "Failed to process video",
+        })
+      }
+    }
+  }
+
+  const handleFarewellVideoUpload = async (farewellId, method = "upload") => {
+    const farewellItem = props.farewell.find((f) => f.id === farewellId)
+    if (!farewellItem.title || !farewellItem.description) {
+      Swal.fire({
+        icon: "warning",
+        title: "Missing Information",
+        text: "Please enter farewell title and description first.",
+      })
+      return
+    }
+
+    try {
+      let file
+
+      if (method === "record") {
+        file = await recordVideo()
+      } else if (method === "upload") {
+        file = await new Promise((resolve) => {
+          handleFileSelect(resolve)
+        })
+      }
+
+      if (file) {
+        const updatedFarewell = props.farewell.map((f) => (f.id === farewellId ? { ...f, video: file } : f))
+        props.setFarewell(updatedFarewell)
+      }
+    } catch (error) {
+      console.error("Error handling farewell video:", error)
+      if (error.message !== "Recording cancelled") {
+        Swal.fire({
+          icon: "error",
+          title: "Upload Error",
+          text: error.message || "Failed to process video",
+        })
+      }
+    }
+  }
+
+  // Question management
+  const handleAddQuestion = () => {
+    const newQuestion = {
+      id: props.questions.length + 1,
+      title: "",
+      description: "",
+      video: null,
+      Timetothink: props.candidateThinkingTime,
+      Timetoanswer: props.candidateMaxAnswerLength,
+      Retakes: props.answerRetakesAllowed,
+    }
+    props.setQuestions([...props.questions, newQuestion])
+  }
+
+  const handleRemoveQuestion = (id) => {
+    const updatedQuestions = props.questions.filter((q) => q.id !== id)
+    const renumberedQuestions = updatedQuestions.map((q, index) => ({
+      ...q,
+      id: index + 1,
+    }))
+    props.setQuestions(renumberedQuestions)
+  }
+
+  const handleAddFarewell = () => {
+    const newFarewell = {
+      id: 1,
+      title: "Interview Completed Successfully 😊",
+      description: "Thank you for completing the interview, we will get back to you shortly.",
+      video: null,
+    }
+    props.setFarewell([newFarewell])
+  }
+
+  const handleRemoveFarewell = () => {
+    props.setFarewell([])
+  }
+
+  // Settings management
+  const handleSettingsClick = (questionId) => {
+    setCurrentQuestionSettings(questionId)
+    setShowSettingsPopup(true)
+  }
+
+  const handleSettingsChange = (setting, value) => {
+    setQuestionSettings((prev) => ({
+      ...prev,
+      [currentQuestionSettings]: {
+        ...prev[currentQuestionSettings],
+        [setting]: value,
+      },
+    }))
+  }
+
+  const closeSettingsPopup = () => {
+    if (currentQuestionSettings) {
+      const updatedQuestions = props.questions.map((q) => {
+        if (q.id === currentQuestionSettings) {
+          const settings = questionSettings[currentQuestionSettings] || {}
+          return {
+            ...q,
+            Timetothink: settings.Timetothink || q.Timetothink,
+            Timetoanswer: settings.Timetoanswer || q.Timetoanswer,
+            Retakes: settings.Retakes || q.Retakes,
+          }
+        }
+        return q
+      })
+      props.setQuestions(updatedQuestions)
+    }
+    setShowSettingsPopup(false)
+    setCurrentQuestionSettings(null)
+  }
+
+  // Preview functionality
+  const createPreviewData = () => {
+    const previewItems = []
+
+    if (props.interviewStartVideo) {
+      previewItems.push({
+        type: "intro",
+        title: props.interviewStartTitle || "Welcome to the Interview",
+        description: "Please watch this introduction video before we begin.",
+        video: props.interviewStartVideo,
+      })
+    }
+
+    props.questions.forEach((question, index) => {
+      if (question.video) {
+        previewItems.push({
+          type: "question",
+          title: question.title || `Question ${index + 1}`,
+          description: question.description || "No description provided.",
+          video: question.video,
+          number: index + 1,
+        })
+      }
+    })
+
+    if (props.farewell.length > 0 && props.farewell[0].video) {
+      previewItems.push({
+        type: "farewell",
+        title: props.farewell[0].title || "Thank You!",
+        description: props.farewell[0].description || "Thank you for completing the interview.",
+        video: props.farewell[0].video,
+      })
+    }
+
+    return previewItems
+  }
+
+  const openPreview = () => {
+    const previewData = createPreviewData()
+    if (previewData.length === 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "No Content to Preview",
+        text: "Please add at least one video to preview the interview.",
+      })
+      return
+    }
+    setPreviewCount(0)
+    setIsPopupOpen(true)
+  }
+
+  // Drag and drop for reordering questions
+  const handleQuestionDragStart = (e, questionId) => {
+    setDraggedItem(questionId)
+    e.dataTransfer.effectAllowed = "move"
+  }
+
+  const handleQuestionDragOver = (e) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = "move"
+  }
+
+  const handleQuestionDrop = (e, targetId) => {
+    e.preventDefault()
+
+    if (draggedItem && draggedItem !== targetId) {
+      const draggedIndex = props.questions.findIndex((q) => q.id === draggedItem)
+      const targetIndex = props.questions.findIndex((q) => q.id === targetId)
+
+      const newQuestions = [...props.questions]
+      const [draggedQuestion] = newQuestions.splice(draggedIndex, 1)
+      newQuestions.splice(targetIndex, 0, draggedQuestion)
+
+      const renumberedQuestions = newQuestions.map((q, index) => ({
+        ...q,
+        id: index + 1,
+      }))
+
+      props.setQuestions(renumberedQuestions)
+    }
+    setDraggedItem(null)
+  }
+
+  // Get video preview URL
+  const getVideoPreviewUrl = (video) => {
+    if (!video) return null
+    if (typeof video === "string") return video
+    if (video instanceof File || video instanceof Blob) {
+      return URL.createObjectURL(video)
+    }
+    return null
   }
 
   return (
-    <div className="CustomBrandingUI-container">
-      <div className="CustomBrandingUI-header">
-        <h2>Custom Brandings</h2>
-        <p className="CustomBrandingUI-description">
-          Create themes with a custom logo, button colors, and company name to use on your interviews.
-        </p>
-      </div>
+    <div className="main-container">
+      <div className="content-wrapper">
+        <div className="back-button-container">
+          <button onClick={props.prevStep} className="back-button">
+            ← Back
+          </button>
+        </div>
 
-      <div className="CustomBrandingUI-content">
-        <button className="CustomBrandingUI-create-branding-btn" onClick={handleCreateNew}>
-          <FiPlus className="CustomBrandingUI-btn-icon" />
-          Create New Branding
-        </button>
-
-        {brandings.length > 0 && (
-          <div className="CustomBrandingUI-brandings-grid">
-            {brandings.map((branding) => (
-              <div key={branding.id} className="CustomBrandingUI-branding-card">
-                <div className="CustomBrandingUI-branding-preview">
-                  <div className="CustomBrandingUI-preview-header" style={{ backgroundColor: branding.brandColor }}>
-                    {branding.logoUrl && (
-                      <img
-                        src={branding.logoUrl || "/placeholder.svg"}
-                        alt="Brand Logo"
-                        className="CustomBrandingUI-preview-logo"
-                      />
-                    )}
-                    <span className="CustomBrandingUI-preview-company-name">{branding.companyName}</span>
+        <div className="interview-creation-container">
+          {/* Interview Starter Section */}
+          <div className="starter-section">
+            <div
+              className="video-upload-area"
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, (file) => props.setInterviewStartVideo(file))}
+              onClick={() => handleIntroVideoUpload("record")}
+            >
+              {props.interviewStartVideo && (
+                <div className="video-action-buttons">
+                  <div
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      props.setInterviewStartVideo(null)
+                    }}
+                    className="delete-video-button"
+                    title="Delete Video"
+                  >
+                    <FiTrash size={20} />
                   </div>
-                  <div className="CustomBrandingUI-preview-content">
-                    <h4>{branding.interviewTitle}</h4>
-                    <button className="CustomBrandingUI-preview-btn" style={{ backgroundColor: branding.brandColor }}>
-                      Start Interview
+                </div>
+              )}
+
+              {props.interviewStartVideo ? (
+                <video src={getVideoPreviewUrl(props.interviewStartVideo)} controls className="preview-video" />
+              ) : (
+                <div className="upload-content">
+                  <FaVideo size={30} />
+                  <h3>Interview Starter</h3>
+                  <p>Click to record or drop video file here</p>
+                  <div className="upload-buttons">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleIntroVideoUpload("record")
+                      }}
+                    >
+                      Record Video
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleIntroVideoUpload("upload")
+                      }}
+                    >
+                      Upload Video
                     </button>
                   </div>
                 </div>
+              )}
+            </div>
 
-                <div className="CustomBrandingUI-branding-actions">
-                  <button
-                    className="CustomBrandingUI-action-btn CustomBrandingUI-edit-btn"
-                    onClick={() => handleEdit(branding)}
-                  >
-                    <FiEdit />
-                  </button>
-                  <button
-                    className="CustomBrandingUI-action-btn CustomBrandingUI-delete-btn"
-                    onClick={() => handleDelete(branding.id)}
-                  >
-                    <FiTrash2 />
-                  </button>
+            <div className="title-section">
+              <input
+                type="text"
+                placeholder="Enter your interview title here..."
+                className="interview-title-input"
+                value={props.interviewStartTitle}
+                onChange={(e) => props.setInterviewStartTitle(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* Questions Section */}
+          {props.questions.map((question, index) => (
+            <div
+              key={question.id}
+              className="question-section"
+              draggable
+              onDragStart={(e) => handleQuestionDragStart(e, question.id)}
+              onDragOver={handleQuestionDragOver}
+              onDrop={(e) => handleQuestionDrop(e, question.id)}
+            >
+              <div>
+                <div className="number-circle">{index + 1}</div>
+              </div>
+              <div className="quesntioncomparter">
+                <div
+                  className="video-upload-area"
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) =>
+                    handleDrop(e, (file) => {
+                      const updatedQuestions = props.questions.map((q) =>
+                        q.id === question.id ? { ...q, video: file } : q,
+                      )
+                      props.setQuestions(updatedQuestions)
+                    })
+                  }
+                  onClick={() => handleQuestionVideoUpload(question.id, "record")}
+                >
+                  {question.video && (
+                    <div className="video-action-buttons">
+                      <div
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          const updatedQuestions = props.questions.map((q) =>
+                            q.id === question.id ? { ...q, video: null } : q,
+                          )
+                          props.setQuestions(updatedQuestions)
+                        }}
+                        className="delete-video-button"
+                        title="Delete Video"
+                      >
+                        <FiTrash size={20} />
+                      </div>
+                    </div>
+                  )}
+
+                  {question.video ? (
+                    <video src={getVideoPreviewUrl(question.video)} controls className="preview-video" />
+                  ) : (
+                    <div className="upload-content">
+                      <FaVideo className="video-icon" />
+                      <h3>Question Video</h3>
+                      <p>Click to record or drop video file here</p>
+                      <div className="upload-buttons">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleQuestionVideoUpload(question.id, "record")
+                          }}
+                        >
+                          Record Video
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleQuestionVideoUpload(question.id, "upload")
+                          }}
+                        >
+                          Upload Video
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="question-content">
+                  <div className="input-fields">
+                    <div className="question-content-child1">
+                      <input
+                        type="text"
+                        placeholder="Question title here"
+                        value={question.title || ""}
+                        onChange={(e) => {
+                          const updatedQuestions = props.questions.map((q) =>
+                            q.id === question.id ? { ...q, title: e.target.value } : q,
+                          )
+                          props.setQuestions(updatedQuestions)
+                        }}
+                        className="question-input"
+                      />
+                      <textarea
+                        placeholder="Full question (max 1200 chars)"
+                        maxLength="1200"
+                        value={question.description || ""}
+                        onChange={(e) => {
+                          const updatedQuestions = props.questions.map((q) =>
+                            q.id === question.id ? { ...q, description: e.target.value } : q,
+                          )
+                          props.setQuestions(updatedQuestions)
+                        }}
+                        className="question-textarea"
+                      />
+                    </div>
+                    <div className="action-icons">
+                      <div className="icon-button settings-icon" onClick={() => handleSettingsClick(question.id)}>
+                        <FiSettings />
+                      </div>
+                      <div className="icon-button delete-icon" onClick={() => handleRemoveQuestion(question.id)}>
+                        <FiTrash />
+                      </div>
+                      <div
+                        className="icon-button delete-icon"
+                        onDragStart={(e) => handleQuestionDragStart(e, question.id)}
+                        onDragOver={handleQuestionDragOver}
+                        onDrop={(e) => handleQuestionDrop(e, question.id)}
+                      >
+                        <MdDragIndicator size={24} />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            ))}
+            </div>
+          ))}
+
+          {/* Add Question/Farewell Buttons */}
+          <div className="button-container">
+            <button className="add-button" onClick={handleAddQuestion}>
+              + Add Question
+            </button>
+
+            {props.farewell.length === 0 && (
+              <button className="add-button farewell-button" onClick={handleAddFarewell}>
+                + Add Farewell Video & Message
+              </button>
+            )}
+          </div>
+
+          {/* Farewell Section */}
+          {props.farewell.map((farewellItem) => (
+            <div key={farewellItem.id} className="question-section farewell-section">
+              <div className="number-circle farewell-circle">
+                <GiPartyPopper />
+              </div>
+              <div className="quesntioncomparter">
+                <div
+                  className="video-upload-area"
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) =>
+                    handleDrop(e, (file) => {
+                      const updatedFarewell = props.farewell.map((f) =>
+                        f.id === farewellItem.id ? { ...f, video: file } : f,
+                      )
+                      props.setFarewell(updatedFarewell)
+                    })
+                  }
+                  onClick={() => handleFarewellVideoUpload(farewellItem.id, "record")}
+                >
+                  {farewellItem.video && (
+                    <div className="video-action-buttons">
+                      <div
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          const updatedFarewell = props.farewell.map((f) =>
+                            f.id === farewellItem.id ? { ...f, video: null } : f,
+                          )
+                          props.setFarewell(updatedFarewell)
+                        }}
+                        className="delete-video-button"
+                        title="Delete Video"
+                      >
+                        <FiTrash size={20} />
+                      </div>
+                    </div>
+                  )}
+
+                  {farewellItem.video ? (
+                    <video src={getVideoPreviewUrl(farewellItem.video)} controls className="preview-video" />
+                  ) : (
+                    <div className="upload-content">
+                      <FaVideo className="video-icon" />
+                      <h3>Farewell Video</h3>
+                      <p>Click to record or drop video file here</p>
+                      <div className="upload-buttons">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleFarewellVideoUpload(farewellItem.id, "record")
+                          }}
+                        >
+                          Record Video
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleFarewellVideoUpload(farewellItem.id, "upload")
+                          }}
+                        >
+                          Upload Video
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="question-content">
+                  <div className="input-fields">
+                    <div className="question-content-child1">
+                      <input
+                        type="text"
+                        placeholder="Farewell title (max 40 chars)"
+                        maxLength="40"
+                        value={farewellItem.title}
+                        onChange={(e) => {
+                          const updatedFarewell = props.farewell.map((f) =>
+                            f.id === farewellItem.id ? { ...f, title: e.target.value } : f,
+                          )
+                          props.setFarewell(updatedFarewell)
+                        }}
+                        className="question-input"
+                      />
+                      <textarea
+                        placeholder="Farewell message (max 1200 chars)"
+                        maxLength="1200"
+                        value={farewellItem.description}
+                        onChange={(e) => {
+                          const updatedFarewell = props.farewell.map((f) =>
+                            f.id === farewellItem.id ? { ...f, description: e.target.value } : f,
+                          )
+                          props.setFarewell(updatedFarewell)
+                        }}
+                        className="question-textarea"
+                      />
+                    </div>
+                    <div className="action-icons">
+                      <div className="icon-button delete-icon" onClick={handleRemoveFarewell}>
+                        <FiTrash />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {/* Save Buttons */}
+          <div className="save-button-container">
+            <button onClick={openPreview} className="save-button" disabled={props.isUploading}>
+              Preview Interview
+            </button>
+            <button onClick={props.saveInterview} className="save-button" disabled={props.isUploading}>
+              {props.isUploading ? (
+                <>
+                  <FaSpinner className="spinner" /> Saving...
+                </>
+              ) : (
+                "Save Interview"
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Preview Popup */}
+        {isPopupOpen && (
+          <div className="creatingsteppopup-vi-popup-overlay">
+            <div className="creatingsteppopup-vi-popup-container">
+              <div className="creatingsteppopup-vi-popup-close-button" onClick={() => setIsPopupOpen(false)}>
+                <FiX size={24} />
+              </div>
+
+              <div className="creatingsteppopup-vi-popup-content">
+                <div className="creatingsteppopup-vi-popup-video-section">
+                  <div className="creatingsteppopup-vi-popup-video-wrapper">
+                    <div className="creatingsteppopup-vi-popup-video-container">
+                      <video
+                        className="creatingsteppopup-vi-popup-video"
+                        src={getVideoPreviewUrl(createPreviewData()[previewCount]?.video)}
+                        controls
+                        autoPlay
+                      />
+                    </div>
+
+                    <div className="creatingsteppopup-vi-popup-progress">
+                      <div className="creatingsteppopup-vi-popup-progress-text">
+                        {previewCount + 1} / {createPreviewData().length}
+                      </div>
+                      <div className="creatingsteppopup-vi-popup-progress-bar">
+                        <div
+                          className="creatingsteppopup-vi-popup-progress-fill"
+                          style={{
+                            width: `${((previewCount + 1) / createPreviewData().length) * 100}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="creatingsteppopup-vi-popup-info-section">
+                    <div className="creatingsteppopup-vi-popup-info-content">
+                      <div className="creatingsteppopup-vi-popup-badge">
+                        {createPreviewData()[previewCount]?.type === "intro" && "Introduction"}
+                        {createPreviewData()[previewCount]?.type === "question" &&
+                          `Question ${createPreviewData()[previewCount]?.number}`}
+                        {createPreviewData()[previewCount]?.type === "farewell" && "Farewell"}
+                      </div>
+
+                      <h1 className="creatingsteppopup-vi-popup-question-title">
+                        {createPreviewData()[previewCount]?.title}
+                      </h1>
+
+                      <div className="creatingsteppopup-vi-popup-divider" />
+
+                      <div className="creatingsteppopup-vi-popup-question-description">
+                        {createPreviewData()[previewCount]?.description}
+                      </div>
+
+                      <div className="creatingsteppopup-vi-popup-actions">
+                        {previewCount > 0 && (
+                          <button
+                            className="creatingsteppopup-vi-popup-prev-button"
+                            onClick={() => setPreviewCount(previewCount - 1)}
+                          >
+                            ← Previous
+                          </button>
+                        )}
+
+                        {previewCount < createPreviewData().length - 1 ? (
+                          <button
+                            className="creatingsteppopup-vi-popup-next-button"
+                            onClick={() => setPreviewCount(previewCount + 1)}
+                          >
+                            Next →
+                          </button>
+                        ) : (
+                          <button
+                            className="creatingsteppopup-vi-popup-next-button"
+                            onClick={() => setIsPopupOpen(false)}
+                          >
+                            Finish Preview
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Settings Popup */}
+        {showSettingsPopup && (
+          <div className="settings-popup-overlay">
+            <div className="settings-popup">
+              <div className="popup-header">
+                <h3>Question Settings</h3>
+                <div onClick={closeSettingsPopup} className="close-button">
+                  <FiX />
+                </div>
+              </div>
+
+              <div className="popup-content">
+                <div className="setting-group">
+                  <label>Time to think</label>
+                  <select
+                    value={questionSettings[currentQuestionSettings]?.Timetothink || ""}
+                    onChange={(e) => handleSettingsChange("Timetothink", e.target.value)}
+                    className="setting-select"
+                  >
+                    <option value="">Select Time to think</option>
+                    {settingsOptions.Timetothink.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="setting-group">
+                  <label>Time to answer</label>
+                  <select
+                    value={questionSettings[currentQuestionSettings]?.Timetoanswer || ""}
+                    onChange={(e) => handleSettingsChange("Timetoanswer", e.target.value)}
+                    className="setting-select"
+                  >
+                    <option value="">Select Time to answer</option>
+                    {settingsOptions.Timetoanswer.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="setting-group">
+                  <label>Retakes</label>
+                  <select
+                    value={questionSettings[currentQuestionSettings]?.Retakes || ""}
+                    onChange={(e) => handleSettingsChange("Retakes", e.target.value)}
+                    className="setting-select"
+                  >
+                    <option value="">Select Retakes</option>
+                    {settingsOptions.Retakes.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="popup-footer">
+                <button onClick={closeSettingsPopup} className="apply-button">
+                  Apply Settings
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>
-
-      {isModalOpen && (
-        <BrandingModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onSave={handleSaveBranding}
-          editingBranding={editingBranding}
-        />
-      )}
     </div>
   )
 }
 
-export default CustomBranding
-Chield
+export default Step2
+
+
+
+
 
 "use client"
+import { useState, useEffect } from "react"
+import "./CreateInterview.css"
+import { Link } from "react-router-dom"
+import Step1 from "./InterviewCreating-steps/Step1/Step1"
+import Step2 from "./InterviewCreating-steps/Step2/Step2"
+import { useNavigate } from "react-router-dom"
+import Swal from "sweetalert2"
+import { postReq, putReq } from "../../../../api/request"
 
-import { useState, useEffect, useRef } from "react"
-import { FiX, FiUpload } from "react-icons/fi"
-import "./BrandingModal.css"
+const CreateInterview = () => {
+  const navigate = useNavigate()
+  const [users, setUsers] = useState([])
+  const [limit, setLimit] = useState(3)
+  const [allInterviewsData, setAllInterviewsData] = useState([])
 
-const BrandingModal = ({ isOpen, onClose, onSave, editingBranding }) => {
-  const [formData, setFormData] = useState({
-    companyName: "",
-    interviewTitle: "",
-    brandColor: "#5563FF",
-    logoUrl: "",
-    logoFile: null,
+  const loginedEmail = JSON.parse(localStorage.getItem("LoginedEmail"))
+
+  // Step 1 Settings
+  const [candidateThinkingTime, setCandidateThinkingTime] = useState("1 minute")
+  const [candidateMaxAnswerLength, setCandidateMaxAnswerLength] = useState("2 minutes")
+  const [brandingColorOrLogo, setBrandingColorOrLogo] = useState("No")
+  const [answerRetakesAllowed, setAnswerRetakesAllowed] = useState("Allowed")
+
+  // New state for candidate notifications
+  const [candidateNotifications, setCandidateNotifications] = useState({
+    invitation: {
+      method: "Email",
+      recipient: "Invitation",
+      timing: "On invitation",
+      enabled: true,
+    },
+    reminder: {
+      method: "Email",
+      recipient: "Reminder",
+      timing: "If no response in 24 hours",
+      enabled: true,
+    },
+    completion: {
+      method: "Email",
+      recipient: "Interview completed",
+      timing: "On interview completion",
+      enabled: true,
+    },
   })
-  const [isSaving, setIsSaving] = useState(false)
-  const fileInputRef = useRef(null)
+
+  // Step 2 Data
+  const [interviewStartVideo, setInterviewStartVideo] = useState(null)
+  const [interviewStartTitle, setInterviewStartTitle] = useState("")
+  const [interviewStartTag, setInterviewStartTag] = useState("")
+  const [questions, setQuestions] = useState([])
+  const [farewell, setFarewell] = useState([])
+
+  const [step, setStep] = useState(1)
+  const [isUploading, setIsUploading] = useState(false)
 
   useEffect(() => {
-    if (editingBranding) {
-      setFormData({
-        companyName: editingBranding.companyName || "",
-        interviewTitle: editingBranding.interviewTitle || "",
-        brandColor: editingBranding.brandColor || "#5563FF",
-        logoUrl: editingBranding.logoUrl || "",
-        logoFile: null,
-      })
+    let userIntervalId
+
+    const fetchUsers = async () => {
+      try {
+        const data = await postReq("/users/GetUserByEmail", { companyEmail: loginedEmail })
+        if (data && data.User) {
+          setUsers(data.User)
+        } else {
+          console.error("No data returned from the server.")
+        }
+      } catch (error) {
+        console.error("Error fetching users:", error)
+      }
+    }
+
+    fetchUsers()
+    userIntervalId = setInterval(fetchUsers, 5000)
+
+    return () => clearInterval(userIntervalId)
+  }, [loginedEmail])
+
+  useEffect(() => {
+    let interviewIntervalId
+
+    const fetchInterviews = async () => {
+      try {
+        const result = await postReq("/interview/GetInterviewsbyEmail", { email: loginedEmail })
+        if (result) {
+          console.log("interviews", result)
+          setAllInterviewsData(result.interviews)
+        } else {
+          console.error(result?.message || "Error fetching interviews.")
+        }
+      } catch (error) {
+        console.error("Error fetching interviews:", error)
+      }
+    }
+
+    fetchInterviews()
+    interviewIntervalId = setInterval(fetchInterviews, 5000)
+
+    return () => clearInterval(interviewIntervalId)
+  }, [loginedEmail])
+
+  useEffect(() => {
+    let interviewCount = 0
+
+    allInterviewsData.forEach((data) => {
+      if (loginedEmail === data.email) {
+        interviewCount += 1
+      }
+    })
+
+    if (loginedEmail === users.companyEmail) {
+      if (users.Limit) {
+        setLimit(users.Limit)
+      } else {
+        setLimit(3)
+      }
+    }
+
+    if (interviewCount >= limit) {
+      navigate("/All-Interviews")
+    }
+  }, [allInterviewsData, users, loginedEmail, limit, navigate])
+
+  const moveToStepForward = () => {
+    if (candidateThinkingTime && candidateMaxAnswerLength && brandingColorOrLogo && answerRetakesAllowed) {
+      setStep(step + 1)
     } else {
-      setFormData({
-        companyName: "",
-        interviewTitle: "",
-        brandColor: "#5563FF",
-        logoUrl: "",
-        logoFile: null,
+      Swal.fire({
+        icon: "warning",
+        title: "Please fill all the fields",
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
       })
     }
-  }, [editingBranding])
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
   }
 
-  const handleColorChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      brandColor: e.target.value,
-    }))
-  }
-
-  const handleFileSelect = (e) => {
-    const file = e.target.files[0]
-    if (file) {
-      // Create a preview URL
-      const previewUrl = URL.createObjectURL(file)
-      setFormData((prev) => ({
-        ...prev,
-        logoFile: file,
-        logoUrl: previewUrl,
-      }))
+  const moveToStepPrevious = () => {
+    if (step === 1) {
+      navigate("/All-Interviews")
+    } else {
+      setStep(step - 1)
     }
   }
 
-  const handleFileUpload = () => {
-    fileInputRef.current?.click()
-  }
-
-  const handleSave = async () => {
-    setIsSaving(true)
+  const uploadToCloudinary = async (file) => {
+    const formData = new FormData()
+    formData.append("file", file)
+    formData.append("upload_preset", "InterviewVideo")
 
     try {
-      let logoUrl = formData.logoUrl
+      const response = await fetch(`https://api.cloudinary.com/v1_1/dxl1ejhcc/video/upload`, {
+        method: "POST",
+        body: formData,
+      })
 
-      // If there's a new file, you would upload it to your server/cloud storage here
-      if (formData.logoFile && !formData.logoUrl.startsWith("blob:")) {
-        // This is where you'd implement actual file upload
-        // For now, we'll use the blob URL (in production, upload to your server)
-        logoUrl = formData.logoUrl
+      const responseData = await response.json()
+
+      if (!response.ok) {
+        console.error("Cloudinary Upload Failed:", responseData)
+        throw new Error(responseData.error?.message || "Unknown error occurred")
       }
 
-      const brandingData = {
-        companyName: formData.companyName,
-        interviewTitle: formData.interviewTitle,
-        brandColor: formData.brandColor,
-        logoUrl: logoUrl,
-      }
-
-      await onSave(brandingData)
+      return responseData.secure_url
     } catch (error) {
-      console.error("Error saving branding:", error)
-    } finally {
-      setIsSaving(false)
+      console.error("Upload error:", error)
+      throw error
     }
   }
 
-  if (!isOpen) return null
+  const saveInterview = async () => {
+    // Validation
+    if (
+      !candidateThinkingTime ||
+      !candidateMaxAnswerLength ||
+      !brandingColorOrLogo ||
+      !answerRetakesAllowed ||
+      !interviewStartVideo ||
+      !interviewStartTitle ||
+      questions.length === 0 ||
+      farewell.length === 0
+    ) {
+      let errorMessage = "Please fill all required fields: "
+      const missingFields = []
+
+      if (!candidateThinkingTime) missingFields.push("Thinking Time")
+      if (!candidateMaxAnswerLength) missingFields.push("Answer Length")
+      if (!brandingColorOrLogo) missingFields.push("Branding")
+      if (!answerRetakesAllowed) missingFields.push("Retakes")
+      if (!interviewStartVideo) missingFields.push("Interview Start Video")
+      if (!interviewStartTitle) missingFields.push("Interview Start Title")
+      if (questions.length === 0) missingFields.push("Questions")
+      if (farewell.length === 0) missingFields.push("Farewell")
+
+      errorMessage += missingFields.join(", ")
+
+      Swal.fire({
+        icon: "error",
+        title: "Missing Required Fields",
+        text: errorMessage,
+      })
+      return
+    }
+
+    // Check if all questions have required fields
+    const incompleteQuestions = questions.filter((q) => !q.title || !q.description || !q.video)
+    if (incompleteQuestions.length > 0) {
+      Swal.fire({
+        icon: "error",
+        title: "Incomplete Questions",
+        text: "Please ensure all questions have a title, description, and video.",
+      })
+      return
+    }
+
+    // Check farewell completion
+    if (!farewell[0]?.title || !farewell[0]?.description || !farewell[0]?.video) {
+      Swal.fire({
+        icon: "error",
+        title: "Incomplete Farewell",
+        text: "Please ensure the farewell has a title, description, and video.",
+      })
+      return
+    }
+
+    setIsUploading(true)
+
+    try {
+      // Upload intro video to Cloudinary
+      let introVideoUrl = interviewStartVideo
+      if (interviewStartVideo && typeof interviewStartVideo === "object") {
+        introVideoUrl = await uploadToCloudinary(interviewStartVideo)
+      }
+
+      // Upload question videos to Cloudinary
+      const updatedQuestions = await Promise.all(
+        questions.map(async (question) => {
+          let videoUrl = question.video
+          if (question.video && typeof question.video === "object") {
+            videoUrl = await uploadToCloudinary(question.video)
+          }
+          return {
+            ...question,
+            video: videoUrl,
+            Timetothink: question.Timetothink || candidateThinkingTime,
+            Timetoanswer: question.Timetoanswer || candidateMaxAnswerLength,
+            Retakes: question.Retakes || answerRetakesAllowed,
+          }
+        }),
+      )
+
+      // Upload farewell video to Cloudinary
+      let farewellVideoUrl = farewell[0].video
+      if (farewell[0].video && typeof farewell[0].video === "object") {
+        farewellVideoUrl = await uploadToCloudinary(farewell[0].video)
+      }
+
+      const updatedFarewell = [
+        {
+          ...farewell[0],
+          video: farewellVideoUrl,
+        },
+      ]
+
+      // Prepare data for API
+      const interviewData = {
+        interviewTitle: interviewStartTitle,
+        candidateThinkingTime: candidateThinkingTime,
+        candidateMaxAnswerLength: candidateMaxAnswerLength,
+        brandingColorOrLogo: brandingColorOrLogo,
+        answerRetakesAllowed: answerRetakesAllowed,
+        candidateNotifications: candidateNotifications, // Include notifications
+        interviewStart: {
+          video: introVideoUrl,
+          title: interviewStartTitle,
+          tag: interviewStartTag || "interview",
+        },
+        questions: updatedQuestions,
+        farewell: updatedFarewell[0],
+        email: loginedEmail,
+        Status: "Open",
+      }
+
+      const userUpdatedObj = {
+        _id: users._id,
+        Limit: users.Limit,
+        Plan: users.Plan,
+        Status: users.Status,
+        companyEmail: users.companyEmail,
+        companyEmailPassword: users.companyEmailPassword,
+        companyLocation: users.companyLocation,
+        companyName: users.companyName,
+        userId: users.userId,
+        userName: users.userName,
+        CreatedInterviews: (users.CreatedInterviews || 0) + 1,
+      }
+
+      // Save to database
+      const interviewAddApi = await postReq("/interview/CreateInterview", interviewData)
+      const userUpdateApi = await putReq("/users/UpdateUser", userUpdatedObj)
+
+      if (interviewAddApi && userUpdateApi) {
+        Swal.fire({
+          icon: "success",
+          title: "Interview Created Successfully",
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+        })
+
+        // Clear local storage
+        localStorage.removeItem("interviewData")
+
+        setTimeout(() => {
+          navigate("/All-Interviews")
+        }, 3000)
+      } else {
+        throw new Error("Failed to save interview to database")
+      }
+    } catch (error) {
+      console.error("Error saving interview:", error)
+      Swal.fire({
+        icon: "error",
+        title: "Save Error",
+        text: error.message || "An error occurred while saving the interview. Please try again.",
+      })
+    } finally {
+      setIsUploading(false)
+    }
+  }
 
   return (
-    <div className="BrandingModalUI-modal-overlay">
-      <div className="BrandingModalUI-modal">
-        <div className="BrandingModalUI-modal-header">
-          <h3>
-            <FiUpload className="BrandingModalUI-modal-icon" />
-            New Branding ({editingBranding ? "Edit" : "1"})
-          </h3>
-          <button className="BrandingModalUI-close-btn" onClick={onClose}>
-            <FiX />
-          </button>
-        </div>
-
-        <div className="BrandingModalUI-modal-content">
-          <p className="BrandingModalUI-modal-description">
-            Upload a company logo, set a primary color and set a custom company name for this brand
-          </p>
-
-          <div className="BrandingModalUI-modal-body">
-            <div className="BrandingModalUI-form-section">
-              <div className="BrandingModalUI-form-group">
-                <label htmlFor="companyName">Custom Company Name</label>
-                <div className="BrandingModalUI-input-group">
-                  <span className="BrandingModalUI-input-label">Enable</span>
-                  <input
-                    type="text"
-                    id="companyName"
-                    name="companyName"
-                    value={formData.companyName}
-                    onChange={handleInputChange}
-                    placeholder="Hireflix"
-                  />
-                </div>
-              </div>
-
-              <div className="BrandingModalUI-form-group">
-                <label htmlFor="interviewTitle">Custom Interview Title</label>
-                <div className="BrandingModalUI-input-group">
-                  <span className="BrandingModalUI-input-label">Enable</span>
-                  <input
-                    type="text"
-                    id="interviewTitle"
-                    name="interviewTitle"
-                    value={formData.interviewTitle}
-                    onChange={handleInputChange}
-                    placeholder="E.g. Technical Assessment"
-                  />
-                </div>
-              </div>
-
-              <div className="BrandingModalUI-form-row">
-                <div className="BrandingModalUI-form-group">
-                  <label>Brand logo</label>
-                  <div className="BrandingModalUI-file-upload-area" onClick={handleFileUpload}>
-                    {formData.logoUrl ? (
-                      <img
-                        src={formData.logoUrl || "/placeholder.svg"}
-                        alt="Logo preview"
-                        className="BrandingModalUI-logo-preview"
-                      />
-                    ) : (
-                      <>
-                        <FiUpload className="BrandingModalUI-upload-icon" />
-                        <span>Choose a file...</span>
-                      </>
-                    )}
-                  </div>
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileSelect}
-                    accept="image/*"
-                    style={{ display: "none" }}
-                  />
-                </div>
-
-                <div className="BrandingModalUI-form-group">
-                  <label>Brand color</label>
-                  <div className="BrandingModalUI-color-picker-container">
-                    <div
-                      className="BrandingModalUI-color-preview"
-                      style={{ backgroundColor: formData.brandColor }}
-                    ></div>
-                    <input
-                      type="color"
-                      value={formData.brandColor}
-                      onChange={handleColorChange}
-                      className="BrandingModalUI-color-input"
-                    />
-                    <span className="BrandingModalUI-color-value">{formData.brandColor}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="BrandingModalUI-logo-tips">
-                <h4>How to make your logo look better:</h4>
-                <ul>
-                  <li>
-                    The image should be at least <strong>360px wide</strong> and suitable for a white background.
-                  </li>
-                  <li>
-                    A <strong>horizontal version</strong> of your logo is preferred if available.
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="BrandingModalUI-preview-section">
-              <h4>Preview</h4>
-              <div className="BrandingModalUI-preview-container">
-                <div className="BrandingModalUI-preview-card">
-                  <div className="BrandingModalUI-preview-header">
-                    {formData.logoUrl && (
-                      <img
-                        src={formData.logoUrl || "/placeholder.svg"}
-                        alt="Logo"
-                        className="BrandingModalUI-preview-logo"
-                      />
-                    )}
-                    <span className="BrandingModalUI-preview-company">{formData.companyName || "Hireflix"}</span>
-                  </div>
-                  <div className="BrandingModalUI-preview-body">
-                    <h3>Video Interview</h3>
-                    <p>{formData.interviewTitle || "(Position Title) - aec"}</p>
-                    <button
-                      className="BrandingModalUI-preview-start-btn"
-                      style={{ backgroundColor: formData.brandColor }}
-                    >
-                      Start Interview
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="BrandingModalUI-modal-footer">
-          <button className="BrandingModalUI-save-btn" onClick={handleSave} disabled={isSaving}>
-            {isSaving ? "Saving..." : "Saved"}
-          </button>
-        </div>
+    <div className="enhanced-interview-creator">
+      <div className="flex">
+        <Link to="/All-Interviews"></Link>
+        {step === 1 && (
+          <Step1
+            nextStep={moveToStepForward}
+            prevStep={moveToStepPrevious}
+            candidateThinkingTime={setCandidateThinkingTime}
+            candidateMaxAnswerLength={setCandidateMaxAnswerLength}
+            brandingColorOrLogo={setBrandingColorOrLogo}
+            answerRetakesAllowed={setAnswerRetakesAllowed}
+            candidateThinkingTimeValue={candidateThinkingTime}
+            candidateMaxAnswerLengthValue={candidateMaxAnswerLength}
+            brandingColorOrLogoValue={brandingColorOrLogo}
+            answerRetakesAllowedValue={answerRetakesAllowed}
+            candidateNotifications={candidateNotifications}
+            setCandidateNotifications={setCandidateNotifications}
+          />
+        )}
+        {step === 2 && (
+          <Step2
+            prevStep={moveToStepPrevious}
+            interviewStartTitle={interviewStartTitle}
+            setInterviewStartTitle={setInterviewStartTitle}
+            interviewStartVideo={interviewStartVideo}
+            setInterviewStartVideo={setInterviewStartVideo}
+            interviewStartTag={interviewStartTag}
+            setInterviewStartTag={setInterviewStartTag}
+            questions={questions}
+            setQuestions={setQuestions}
+            farewell={farewell}
+            setFarewell={setFarewell}
+            saveInterview={saveInterview}
+            isUploading={isUploading}
+            candidateThinkingTime={candidateThinkingTime}
+            candidateMaxAnswerLength={candidateMaxAnswerLength}
+            answerRetakesAllowed={answerRetakesAllowed}
+          />
+        )}
       </div>
     </div>
   )
 }
 
-export default BrandingModal
-chields model
+export default CreateInterview
 
 
-.AccountSettingUI-settings-container {
-  padding: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
 
-.AccountSettingUI-settings-content {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-}
 
-.AccountSettingUI-settings-main {
-  display: flex;
-  min-height: 600px;
-}
 
-.AccountSettingUI-settings-menu {
-  width: 280px;
-  background: #f8f9fa;
-  border-right: 1px solid #e1e5e9;
-  padding: 20px 0;
-}
 
-.AccountSettingUI-settings-menu nav {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
 
-.AccountSettingUI-menu-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 20px;
-  border: none;
-  background: none;
-  text-align: left;
-  font-size: 14px;
-  color: #6b7280;
-  cursor: pointer;
-  transition: all 0.2s;
-  border-radius: 0;
-}
 
-.AccountSettingUI-menu-item:hover {
-  background: #e5e7eb;
-  color: #374151;
-}
 
-.AccountSettingUI-menu-item.AccountSettingUI-active {
-  background: #3b82f6;
-  color: white;
-  font-weight: 500;
-}
 
-.AccountSettingUI-menu-icon {
-  font-size: 16px;
-  min-width: 16px;
-}
+const InterviewModel = require("../../Model/InterviewSchema/InterviewSchema")
 
-.AccountSettingUI-settings-details {
-  flex: 1;
-  padding: 0;
-  overflow-y: auto;
-}
+async function CreateInterview(req, res) {
+  try {
+    const body = req.body
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .AccountSettingUI-settings-main {
-    flex-direction: column;
-  }
+    // 🔍 Log data in terminal (backend console)
+    console.log("Frontend sent body:", body)
 
-  .AccountSettingUI-settings-menu {
-    width: 100%;
-    border-right: none;
-    border-bottom: 1px solid #e1e5e9;
-  }
+    // Interview create karo
+    const createdInterview = await InterviewModel.create(body)
 
-  .AccountSettingUI-settings-menu nav {
-    flex-direction: row;
-    overflow-x: auto;
-    padding: 0 10px;
-  }
-
-  .AccountSettingUI-menu-item {
-    white-space: nowrap;
-    min-width: fit-content;
+    // Frontend ko response do (yahan dena zaroori hai warna frontend hang ho jayega
+    return res.status(201).json({ Message: "Interview Created Successfully", createdInterview })
+  } catch (e) {
+    console.error("Error:", e)
+    return res.status(500).json({ Message: "Server Problem" })
   }
 }
-parent css
 
-.CustomBrandingUI-container {
-  padding: 24px;
-  max-width: 1200px;
-}
+async function GetInterviews(req, res) {
+  try {
+    // Fetch all interviews from the database
+    const interviews = await InterviewModel.find()
 
-.CustomBrandingUI-header {
-  margin-bottom: 32px;
-}
-
-.CustomBrandingUI-header h2 {
-  font-size: 28px;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin-bottom: 8px;
-}
-
-.CustomBrandingUI-description {
-  font-size: 16px;
-  color: #666;
-  line-height: 1.5;
-  margin: 0;
-}
-
-.CustomBrandingUI-content {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.CustomBrandingUI-create-branding-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 24px;
-  background-color: #5563ff;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  align-self: flex-start;
-}
-
-.CustomBrandingUI-create-branding-btn:hover {
-  background-color: #4451e6;
-}
-
-.CustomBrandingUI-btn-icon {
-  font-size: 18px;
-}
-
-.CustomBrandingUI-brandings-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 24px;
-  margin-top: 24px;
-}
-
-.CustomBrandingUI-branding-card {
-  border: 1px solid #e1e5e9;
-  border-radius: 12px;
-  overflow: hidden;
-  background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.CustomBrandingUI-branding-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-}
-
-.CustomBrandingUI-branding-preview {
-  padding: 16px;
-}
-
-.CustomBrandingUI-preview-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  color: white;
-}
-
-.CustomBrandingUI-preview-logo {
-  width: 32px;
-  height: 32px;
-  object-fit: contain;
-  background: white;
-  border-radius: 4px;
-  padding: 4px;
-}
-
-.CustomBrandingUI-preview-company-name {
-  font-weight: 600;
-  font-size: 16px;
-}
-
-.CustomBrandingUI-preview-content h4 {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: #1a1a1a;
-}
-
-.CustomBrandingUI-preview-btn {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
-  color: white;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.CustomBrandingUI-branding-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  padding: 12px 16px;
-  border-top: 1px solid #f0f0f0;
-  background: #fafafa;
-}
-
-.CustomBrandingUI-action-btn {
-  padding: 8px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s;
-}
-
-.CustomBrandingUI-edit-btn {
-  background: #f0f9ff;
-  color: #0369a1;
-}
-
-.CustomBrandingUI-edit-btn:hover {
-  background: #e0f2fe;
-}
-
-.CustomBrandingUI-delete-btn {
-  background: #fef2f2;
-  color: #dc2626;
-}
-
-.CustomBrandingUI-delete-btn:hover {
-  background: #fee2e2;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .CustomBrandingUI-container {
-    padding: 16px;
-  }
-
-  .CustomBrandingUI-brandings-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-
-  .CustomBrandingUI-header h2 {
-    font-size: 24px;
-  }
-
-  .CustomBrandingUI-description {
-    font-size: 14px;
+    // Return the fetched interviews in the response
+    return res.status(200).json({
+      Message: "All Interviews Fetched Successfully",
+      interviews,
+    })
+  } catch (e) {
+    console.error("Error:", e)
+    return res.status(500).json({ Message: "Server Problem" })
   }
 }
-child css
 
+async function GetFilteredInterviews(req, res) {
+  try {
+    const { interviewIds } = req.body
 
-.BrandingModalUI-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 20px;
-}
+    // Fetch only those interviews whose _id exists in interviewIds array
+    const interviews = await InterviewModel.find({ _id: { $in: interviewIds } })
 
-.BrandingModalUI-modal {
-  background: white;
-  border-radius: 12px;
-  width: 100%;
-  max-width: 900px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-}
-
-.BrandingModalUI-modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 24px;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.BrandingModalUI-modal-header h3 {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 18px;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 0;
-}
-
-.BrandingModalUI-modal-icon {
-  font-size: 20px;
-  color: #6b7280;
-}
-
-.BrandingModalUI-close-btn {
-  padding: 8px;
-  border: none;
-  background: none;
-  cursor: pointer;
-  border-radius: 6px;
-  color: #6b7280;
-  transition: background-color 0.2s;
-}
-
-.BrandingModalUI-close-btn:hover {
-  background: #f3f4f6;
-}
-
-.BrandingModalUI-modal-content {
-  padding: 24px;
-}
-
-.BrandingModalUI-modal-description {
-  color: #6b7280;
-  font-size: 14px;
-  margin-bottom: 24px;
-  line-height: 1.5;
-}
-
-.BrandingModalUI-modal-body {
-  display: grid;
-  grid-template-columns: 1fr 300px;
-  gap: 32px;
-}
-
-.BrandingModalUI-form-section {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.BrandingModalUI-form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.BrandingModalUI-form-group label {
-  font-size: 14px;
-  font-weight: 500;
-  color: #374151;
-}
-
-.BrandingModalUI-input-group {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.BrandingModalUI-input-label {
-  font-size: 12px;
-  color: #9ca3af;
-  min-width: 50px;
-}
-
-.BrandingModalUI-input-group input {
-  flex: 1;
-  padding: 10px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 14px;
-  transition: border-color 0.2s;
-}
-
-.BrandingModalUI-input-group input:focus {
-  outline: none;
-  border-color: #5563ff;
-  box-shadow: 0 0 0 3px rgba(85, 99, 255, 0.1);
-}
-
-.BrandingModalUI-form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
-
-.BrandingModalUI-file-upload-area {
-  border: 2px dashed #d1d5db;
-  border-radius: 8px;
-  padding: 24px;
-  text-align: center;
-  cursor: pointer;
-  transition: border-color 0.2s;
-  min-height: 80px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.BrandingModalUI-file-upload-area:hover {
-  border-color: #5563ff;
-}
-
-.BrandingModalUI-upload-icon {
-  font-size: 24px;
-  color: #9ca3af;
-}
-
-.BrandingModalUI-logo-preview {
-  max-width: 100px;
-  max-height: 60px;
-  object-fit: contain;
-}
-
-.BrandingModalUI-color-picker-container {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.BrandingModalUI-color-preview {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 2px solid #e5e7eb;
-}
-
-.BrandingModalUI-color-input {
-  width: 40px;
-  height: 40px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.BrandingModalUI-color-value {
-  font-size: 14px;
-  color: #6b7280;
-  font-family: monospace;
-}
-
-.BrandingModalUI-logo-tips {
-  background: #f9fafb;
-  padding: 16px;
-  border-radius: 8px;
-  border-left: 4px solid #5563ff;
-}
-
-.BrandingModalUI-logo-tips h4 {
-  font-size: 14px;
-  font-weight: 600;
-  color: #374151;
-  margin: 0 0 8px 0;
-}
-
-.BrandingModalUI-logo-tips ul {
-  margin: 0;
-  padding-left: 16px;
-  font-size: 13px;
-  color: #6b7280;
-  line-height: 1.5;
-}
-
-.BrandingModalUI-logo-tips li {
-  margin-bottom: 4px;
-}
-
-.BrandingModalUI-preview-section h4 {
-  font-size: 16px;
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 16px;
-}
-
-.BrandingModalUI-preview-container {
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 16px;
-  background: #f9fafb;
-}
-
-.BrandingModalUI-preview-card {
-  background: white;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.BrandingModalUI-preview-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px;
-  background: #5563ff;
-  color: white;
-}
-
-.BrandingModalUI-preview-logo {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
-  background: white;
-  border-radius: 4px;
-  padding: 2px;
-}
-
-.BrandingModalUI-preview-company {
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.BrandingModalUI-preview-body {
-  padding: 20px;
-  text-align: center;
-}
-
-.BrandingModalUI-preview-body h3 {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 0 0 8px 0;
-}
-
-.BrandingModalUI-preview-body p {
-  color: #6b7280;
-  font-size: 14px;
-  margin: 0 0 16px 0;
-}
-
-.BrandingModalUI-preview-start-btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 6px;
-  color: white;
-  font-weight: 500;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.BrandingModalUI-modal-footer {
-  padding: 16px 24px;
-  border-top: 1px solid #e5e7eb;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.BrandingModalUI-save-btn {
-  padding: 10px 24px;
-  background: #10b981;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.BrandingModalUI-save-btn:hover:not(:disabled) {
-  background: #059669;
-}
-
-.BrandingModalUI-save-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .BrandingModalUI-modal-body {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-
-  .BrandingModalUI-form-row {
-    grid-template-columns: 1fr;
-  }
-
-  .BrandingModalUI-modal {
-    margin: 10px;
-    max-width: calc(100vw - 20px);
-  }
-
-  .BrandingModalUI-modal-content {
-    padding: 16px;
-  }
-
-  .BrandingModalUI-modal-header {
-    padding: 16px;
-  }
-
-  .BrandingModalUI-modal-footer {
-    padding: 12px 16px;
+    res.status(200).json({ Message: "Interviews getted seuccessfully", FilteredInterviews: interviews })
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching interviews", error })
   }
 }
-child model css
+
+async function FilterInterviewById(req, res) {
+  try {
+    const { _id } = req.body
+
+    if (!_id) {
+      return res.status(400).json({ message: "Interview ID is required" })
+    }
+
+    // Fetch the interview by ID
+    const interview = await InterviewModel.findById(_id)
+
+    if (!interview) {
+      return res.status(404).json({ message: "Interview not found" })
+    }
+
+    res.status(200).json({
+      message: "Interview retrieved successfully",
+      interview,
+    })
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching interview", error: error.message })
+  }
+}
+
+async function DeleteInterview(req, res) {
+  try {
+    const { _id } = req.body // Get the ID from the request body
+
+    // Validate ID
+    if (!_id) {
+      return res.status(400).json({ Message: "Interview ID is required" })
+    }
+
+    // Delete the specific interview by ID
+    const deletedInterview = await InterviewModel.findByIdAndDelete(_id)
+
+    // Check if the interview was found and deleted
+    if (!deletedInterview) {
+      return res.status(404).json({ Message: "Interview not found" })
+    }
+
+    return res.status(200).json({
+      Message: "Interview deleted successfully",
+      DeletedInterview: deletedInterview, // Optional: Return the deleted document
+    })
+  } catch (error) {
+    console.error("Error deleting interview:", error)
+    return res.status(500).json({ Message: "Server problem", Error: error.message })
+  }
+}
+
+async function GetInterviewsbyEmail(req, res) {
+  try {
+    const { email } = req.body // Extract email from request body
+
+    // Validate email
+    if (!email) {
+      return res.status(400).json({ Message: "Email is required" })
+    }
+
+    // Find all interviews matching the email
+    const interviews = await InterviewModel.find({ email })
+
+    // Check if any interviews exist
+    if (interviews.length === 0) {
+      return res.status(404).json({ Message: "No interviews found" })
+    }
+
+    return res.status(200).json({
+      Message: "Interviews found successfully",
+      interviews, // Return all found interviews
+    })
+  } catch (error) {
+    console.error("Error fetching interviews:", error)
+    return res.status(500).json({ Message: "Server problem", Error: error.message })
+  }
+}
+
+const updateInterviewStatus = async (req, res) => {
+  try {
+    const { _id, Status } = req.body // Get interview ID and new Status from request body
+
+    if (!_id || !Status) {
+      return res.status(400).json({ message: "Interview ID and Status are required" })
+    }
+
+    const updatedInterview = await InterviewModel.findByIdAndUpdate(
+      _id,
+      { Status },
+      { new: true }, // Returns the updated document
+    )
+
+    if (!updatedInterview) {
+      return res.status(404).json({ message: "Interview not found" })
+    }
+
+    res.status(200).json({
+      message: "Interview Status updated successfully",
+      updatedInterview,
+    })
+  } catch (error) {
+    console.error("Error updating interview Status:", error)
+    res.status(500).json({ message: "Internal server error", error })
+  }
+}
+
+async function UpdateInterview(req, res) {
+  try {
+    const { _id, ...updatedData } = req.body // Extract _id and the rest of the updated data
+    console.log(_id, "id-updatedData")
+    console.log(updatedData, "updatedData")
+    // Validate ID and updated data
+    if (!_id) {
+      return res.status(400).json({ Message: "Interview ID is required" })
+    }
+
+    // Update the interview by ID with the new data
+    const updatedInterview = await InterviewModel.findByIdAndUpdate(
+      _id,
+      updatedData,
+      { new: true }, // Returns the updated document
+    )
+
+    // Check if the interview was found and updated
+    if (!updatedInterview) {
+      return res.status(404).json({ Message: "Interview not found" })
+    }
+
+    return res.status(200).json({
+      Message: "Interview updated successfully",
+      UpdatedInterview: updatedInterview, // Return the updated document
+    })
+  } catch (error) {
+    console.error("Error updating interview:", error)
+    return res.status(500).json({ Message: "Server problem", Error: error.message })
+  }
+}
+
+// New function to handle notification sending
+async function SendCandidateNotification(req, res) {
+  try {
+    const { interviewId, notificationType, candidateEmail, candidatePhone } = req.body
+
+    // Validate required fields
+    if (!interviewId || !notificationType || !candidateEmail) {
+      return res.status(400).json({
+        message: "Interview ID, notification type, and candidate email are required",
+      })
+    }
+
+    // Fetch interview details
+    const interview = await InterviewModel.findById(interviewId)
+    if (!interview) {
+      return res.status(404).json({ message: "Interview not found" })
+    }
+
+    const notifications = interview.candidateNotifications
+    const notificationConfig = notifications[notificationType]
+
+    if (!notificationConfig || !notificationConfig.enabled) {
+      return res.status(400).json({
+        message: `${notificationType} notifications are not enabled for this interview`,
+      })
+    }
+
+    // Here you would implement the actual email/SMS sending logic
+    // For now, we'll just log the notification details
+    console.log("Sending notification:", {
+      type: notificationType,
+      method: notificationConfig.method,
+      recipient: candidateEmail,
+      timing: notificationConfig.timing,
+      interviewTitle: interview.interviewTitle,
+    })
+
+    // Simulate notification sending
+    const notificationResult = {
+      sent: true,
+      method: notificationConfig.method,
+      recipient: candidateEmail,
+      timestamp: new Date(),
+      type: notificationType,
+    }
+
+    return res.status(200).json({
+      message: "Notification sent successfully",
+      notificationResult,
+    })
+  } catch (error) {
+    console.error("Error sending notification:", error)
+    return res.status(500).json({
+      message: "Server problem",
+      error: error.message,
+    })
+  }
+}
+
+module.exports = {
+  CreateInterview,
+  GetInterviews,
+  DeleteInterview,
+  GetFilteredInterviews,
+  FilterInterviewById,
+  GetInterviewsbyEmail,
+  updateInterviewStatus,
+  UpdateInterview,
+  SendCandidateNotification,
+}
+
+
+
+
+
 
 
 const mongoose = require("mongoose")
 
-// Define the Custom Branding Schema
-const customBrandingSchema = new mongoose.Schema({
-  id: { type: String, required: true },
-  companyName: { type: String, required: true },
-  interviewTitle: { type: String, required: true },
-  brandColor: { type: String, default: "#5563FF" },
-  logoUrl: { type: String },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
-})
-
-// Define the User Schema
-const userSchema = new mongoose.Schema(
+// Define the Interview Schema
+const InterviewSchema = new mongoose.Schema(
   {
-    userId: {
+    interviewTitle: {
       type: String,
     },
-    userName: {
+    candidateThinkingTime: {
       type: String,
     },
-    companyName: {
+    candidateMaxAnswerLength: {
+      type: String, // Length in seconds
+    },
+    brandingColorOrLogo: {
       type: String,
     },
-    companyEmail: {
+    answerRetakesAllowed: {
+      type: String, // Number of retakes allowed
+    },
+    // New field for candidate notifications
+    candidateNotifications: {
+      invitation: {
+        method: { type: String, default: "Email" }, // Email, SMS, Both
+        recipient: { type: String, default: "Invitation" },
+        timing: { type: String, default: "On invitation" },
+        enabled: { type: Boolean, default: true },
+      },
+      reminder: {
+        method: { type: String, default: "Email" },
+        recipient: { type: String, default: "Reminder" },
+        timing: { type: String, default: "If no response in 24 hours" },
+        enabled: { type: Boolean, default: true },
+      },
+      completion: {
+        method: { type: String, default: "Email" },
+        recipient: { type: String, default: "Interview completed" },
+        timing: { type: String, default: "On interview completion" },
+        enabled: { type: Boolean, default: true },
+      },
+    },
+    interviewStart: {
+      video: { type: String }, // URL or path for the video
+      title: { type: String },
+      tag: { type: String },
+    },
+    questions: [
+      {
+        id: { type: Number, required: true },
+        video: { type: String }, // URL or path for the question video
+        title: { type: String },
+        description: { type: String },
+        Timetothink: { type: String }, // Time to think for this specific question
+        Timetoanswer: { type: String }, // Time to answer for this specific question
+        Retakes: { type: String }, // Number of retakes for this specific question
+      },
+    ],
+    farewell: {
+      id: { type: String },
+      video: { type: String }, // URL or path for the video
+      title: { type: String },
+      description: { type: String },
+    },
+    email: {
+      type: String,
+      required: true,
+    },
+    Status: {
       type: String,
     },
-    companyLocation: {
-      type: String,
-    },
-    companyEmailPassword: {
-      type: String,
-    },
-    otp: { type: String },
-    otpExpiry: { type: Date },
-    Status: { type: String },
-    Limit: { type: Number },
-    Plan: { type: String },
-    CreatedInterviews: { type: Number },
-    customBrandings: [customBrandingSchema], // Add this field for custom brandings
   },
   {
-    timestamps: true,
+    timestamps: true, // Automatically add createdAt and updatedAt timestamps
   },
 )
 
-module.exports = mongoose.model("User", userSchema)
-updates schema
+module.exports = mongoose.model("Interview", InterviewSchema)
+
+
+
+
+
+
+
+
+
+
+const express = require("express")
+const Router = express.Router()
+const InterviewController = require("../../Controller/InterviewControllers/InterviewControler")
+
+Router.post("/CreateInterview", InterviewController.CreateInterview)
+Router.get("/GetInterviews", InterviewController.GetInterviews)
+Router.post("/DeleteInterview", InterviewController.DeleteInterview)
+Router.post("/GetFilteredInterviews", InterviewController.GetFilteredInterviews)
+Router.post("/FilterInterviewById", InterviewController.FilterInterviewById)
+Router.post("/GetInterviewsbyEmail", InterviewController.GetInterviewsbyEmail)
+Router.post("/updateInterviewStatus", InterviewController.updateInterviewStatus)
+Router.put("/UpdateInterview/:id", InterviewController.UpdateInterview)
+Router.post("/SendCandidateNotification", InterviewController.SendCandidateNotification)
+
+module.exports = Router
+
+
+
