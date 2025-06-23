@@ -18,15 +18,53 @@ const Step1 = (props) => {
     props.answerRetakesAllowed(e.target.value)
   }
 
-  // Notification handlers
-  const handleNotificationChange = (type, field, value) => {
-    props.setCandidateNotifications((prev) => ({
-      ...prev,
-      [type]: {
-        ...prev[type],
-        [field]: value,
-      },
-    }))
+  // Dynamic notification handlers
+  const handleAddNotification = () => {
+    if (props.candidateNotifications.length < 3) {
+      const newNotification = {
+        id: Date.now(), // Unique ID for each notification
+        method: "Email",
+        to: "",
+        trigger: "",
+      }
+      props.setCandidateNotifications([...props.candidateNotifications, newNotification])
+    }
+  }
+
+  const handleDeleteNotification = (id) => {
+    const updatedNotifications = props.candidateNotifications.filter((notification) => notification.id !== id)
+    props.setCandidateNotifications(updatedNotifications)
+  }
+
+  const handleNotificationChange = (id, field, value) => {
+    const updatedNotifications = props.candidateNotifications.map((notification) => {
+      if (notification.id === id) {
+        const updatedNotification = { ...notification, [field]: value }
+
+        // Reset trigger when "to" changes
+        if (field === "to") {
+          updatedNotification.trigger = ""
+        }
+
+        return updatedNotification
+      }
+      return notification
+    })
+    props.setCandidateNotifications(updatedNotifications)
+  }
+
+  // Get trigger options based on "to" value
+  const getTriggerOptions = (toValue) => {
+    switch (toValue) {
+      case "Invitation":
+        return ["On Invitation", "If no response in 24 hours"]
+      case "Reminder":
+        return ["If no response in 24 hours", "If no response in 48 hours", "If no response in 72 hours"]
+      case "Interview Completion":
+        return ["On Interview Completion"]
+      default:
+        return []
+    }
   }
 
   return (
@@ -169,7 +207,7 @@ const Step1 = (props) => {
                 </select>
               </div>
 
-              {/* Candidate Notifications Section */}
+              {/* Dynamic Candidate Notifications Section */}
               <div
                 style={{
                   marginTop: "30px",
@@ -219,303 +257,200 @@ const Step1 = (props) => {
                     margin: "0 0 20px 0",
                   }}
                 >
-                  Automatically notify candidates by email and/or SMS when inviting them to the position
+                  Automatically notify candidates by email when inviting them to the position
                 </p>
 
-                {/* Invitation Notification */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    marginBottom: "15px",
-                    padding: "10px 0",
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                    <span style={{ fontSize: "14px", fontWeight: "500", minWidth: "60px" }}>Send</span>
-                    <select
-                      style={{
-                        padding: "5px 10px",
-                        border: "1px solid #ddd",
-                        borderRadius: "4px",
-                        fontSize: "13px",
-                        minWidth: "80px",
-                      }}
-                      value={props.candidateNotifications?.invitation?.method || "Email"}
-                      onChange={(e) => handleNotificationChange("invitation", "method", e.target.value)}
-                    >
-                      <option value="Email">Email</option>
-                      <option value="SMS">SMS</option>
-                      <option value="Both">Both</option>
-                    </select>
-                    <span style={{ fontSize: "14px", minWidth: "20px" }}>to</span>
-                    <select
-                      style={{
-                        padding: "5px 10px",
-                        border: "1px solid #ddd",
-                        borderRadius: "4px",
-                        fontSize: "13px",
-                        minWidth: "100px",
-                      }}
-                      value={props.candidateNotifications?.invitation?.recipient || "Invitation"}
-                      onChange={(e) => handleNotificationChange("invitation", "recipient", e.target.value)}
-                    >
-                      <option value="Invitation">Invitation</option>
-                      <option value="All Candidates">All Candidates</option>
-                    </select>
-                    <select
-                      style={{
-                        padding: "5px 10px",
-                        border: "1px solid #ddd",
-                        borderRadius: "4px",
-                        fontSize: "13px",
-                        minWidth: "120px",
-                      }}
-                      value={props.candidateNotifications?.invitation?.timing || "On invitation"}
-                      onChange={(e) => handleNotificationChange("invitation", "timing", e.target.value)}
-                    >
-                      <option value="On invitation">On invitation</option>
-                      <option value="Immediately">Immediately</option>
-                      <option value="1 hour before">1 hour before</option>
-                    </select>
-                  </div>
-                  <div style={{ display: "flex", gap: "10px" }}>
-                    <button
-                      style={{
-                        width: "20px",
-                        height: "20px",
-                        border: "none",
-                        background: "none",
-                        cursor: "pointer",
-                        opacity: 0.6,
-                      }}
-                    >
-                      👁️
-                    </button>
-                    <button
-                      style={{
-                        width: "20px",
-                        height: "20px",
-                        border: "none",
-                        background: "none",
-                        cursor: "pointer",
-                        opacity: 0.6,
-                      }}
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                </div>
-
-                {/* Reminder Notification */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    marginBottom: "15px",
-                    padding: "10px 0",
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                    <span style={{ fontSize: "14px", fontWeight: "500", minWidth: "60px" }}>Send</span>
-                    <select
-                      style={{
-                        padding: "5px 10px",
-                        border: "1px solid #ddd",
-                        borderRadius: "4px",
-                        fontSize: "13px",
-                        minWidth: "80px",
-                      }}
-                      value={props.candidateNotifications?.reminder?.method || "Email"}
-                      onChange={(e) => handleNotificationChange("reminder", "method", e.target.value)}
-                    >
-                      <option value="Email">Email</option>
-                      <option value="SMS">SMS</option>
-                      <option value="Both">Both</option>
-                    </select>
-                    <span style={{ fontSize: "14px", minWidth: "20px" }}>to</span>
-                    <select
-                      style={{
-                        padding: "5px 10px",
-                        border: "1px solid #ddd",
-                        borderRadius: "4px",
-                        fontSize: "13px",
-                        minWidth: "100px",
-                      }}
-                      value={props.candidateNotifications?.reminder?.recipient || "Reminder"}
-                      onChange={(e) => handleNotificationChange("reminder", "recipient", e.target.value)}
-                    >
-                      <option value="Reminder">Reminder</option>
-                      <option value="All Candidates">All Candidates</option>
-                    </select>
-                    <select
-                      style={{
-                        padding: "5px 10px",
-                        border: "1px solid #ddd",
-                        borderRadius: "4px",
-                        fontSize: "13px",
-                        minWidth: "120px",
-                      }}
-                      value={props.candidateNotifications?.reminder?.timing || "If no response in 24 hours"}
-                      onChange={(e) => handleNotificationChange("reminder", "timing", e.target.value)}
-                    >
-                      <option value="If no response in 24 hours">If no response in 24 hours</option>
-                      <option value="If no response in 48 hours">If no response in 48 hours</option>
-                      <option value="If no response in 72 hours">If no response in 72 hours</option>
-                    </select>
-                  </div>
-                  <div style={{ display: "flex", gap: "10px" }}>
-                    <button
-                      style={{
-                        width: "20px",
-                        height: "20px",
-                        border: "none",
-                        background: "none",
-                        cursor: "pointer",
-                        opacity: 0.6,
-                      }}
-                    >
-                      👁️
-                    </button>
-                    <button
-                      style={{
-                        width: "20px",
-                        height: "20px",
-                        border: "none",
-                        background: "none",
-                        cursor: "pointer",
-                        opacity: 0.6,
-                      }}
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                </div>
-
-                {/* Completion Notification */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    marginBottom: "15px",
-                    padding: "10px 0",
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                    <span style={{ fontSize: "14px", fontWeight: "500", minWidth: "60px" }}>Send</span>
-                    <select
-                      style={{
-                        padding: "5px 10px",
-                        border: "1px solid #ddd",
-                        borderRadius: "4px",
-                        fontSize: "13px",
-                        minWidth: "80px",
-                      }}
-                      value={props.candidateNotifications?.completion?.method || "Email"}
-                      onChange={(e) => handleNotificationChange("completion", "method", e.target.value)}
-                    >
-                      <option value="Email">Email</option>
-                      <option value="SMS">SMS</option>
-                      <option value="Both">Both</option>
-                    </select>
-                    <span style={{ fontSize: "14px", minWidth: "20px" }}>to</span>
-                    <select
-                      style={{
-                        padding: "5px 10px",
-                        border: "1px solid #ddd",
-                        borderRadius: "4px",
-                        fontSize: "13px",
-                        minWidth: "100px",
-                      }}
-                      value={props.candidateNotifications?.completion?.recipient || "Interview completed"}
-                      onChange={(e) => handleNotificationChange("completion", "recipient", e.target.value)}
-                    >
-                      <option value="Interview completed">Interview completed</option>
-                      <option value="All Candidates">All Candidates</option>
-                    </select>
-                    <select
-                      style={{
-                        padding: "5px 10px",
-                        border: "1px solid #ddd",
-                        borderRadius: "4px",
-                        fontSize: "13px",
-                        minWidth: "120px",
-                      }}
-                      value={props.candidateNotifications?.completion?.timing || "On interview completion"}
-                      onChange={(e) => handleNotificationChange("completion", "timing", e.target.value)}
-                    >
-                      <option value="On interview completion">On interview completion</option>
-                      <option value="Immediately after">Immediately after</option>
-                      <option value="1 hour after">1 hour after</option>
-                    </select>
-                  </div>
-                  <div style={{ display: "flex", gap: "10px" }}>
-                    <button
-                      style={{
-                        width: "20px",
-                        height: "20px",
-                        border: "none",
-                        background: "none",
-                        cursor: "pointer",
-                        opacity: 0.6,
-                      }}
-                    >
-                      👁️
-                    </button>
-                    <button
-                      style={{
-                        width: "20px",
-                        height: "20px",
-                        border: "none",
-                        background: "none",
-                        cursor: "pointer",
-                        opacity: 0.6,
-                      }}
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                </div>
-
-                {/* Add Message Button */}
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    marginTop: "15px",
-                    cursor: "pointer",
-                  }}
-                >
+                {/* Dynamic Notification Entries */}
+                {props.candidateNotifications.map((notification, index) => (
                   <div
+                    key={notification.id}
                     style={{
-                      width: "20px",
-                      height: "20px",
-                      borderRadius: "50%",
-                      backgroundColor: "#333",
                       display: "flex",
                       alignItems: "center",
-                      justifyContent: "center",
-                      color: "white",
-                      fontSize: "12px",
-                      fontWeight: "bold",
+                      justifyContent: "space-between",
+                      marginBottom: "15px",
+                      padding: "15px",
+                      backgroundColor: "#ffffff",
+                      borderRadius: "6px",
+                      border: "1px solid #e0e0e0",
                     }}
                   >
-                    +
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1 }}>
+                      <span style={{ fontSize: "14px", fontWeight: "500", minWidth: "60px" }}>Send</span>
+
+                      {/* Method Dropdown - Only Email */}
+                      <select
+                        style={{
+                          padding: "5px 10px",
+                          border: "1px solid #ddd",
+                          borderRadius: "4px",
+                          fontSize: "13px",
+                          minWidth: "80px",
+                        }}
+                        value={notification.method}
+                        onChange={(e) => handleNotificationChange(notification.id, "method", e.target.value)}
+                      >
+                        <option value="Email">Email</option>
+                      </select>
+
+                      <span style={{ fontSize: "14px", minWidth: "20px" }}>to</span>
+
+                      {/* To Dropdown */}
+                      <select
+                        style={{
+                          padding: "5px 10px",
+                          border: "1px solid #ddd",
+                          borderRadius: "4px",
+                          fontSize: "13px",
+                          minWidth: "140px",
+                        }}
+                        value={notification.to}
+                        onChange={(e) => handleNotificationChange(notification.id, "to", e.target.value)}
+                      >
+                        <option value="" disabled>
+                          Select Type
+                        </option>
+                        <option value="Invitation">Invitation</option>
+                        <option value="Reminder">Reminder</option>
+                        <option value="Interview Completion">Interview Completion</option>
+                      </select>
+
+                      {/* Trigger Dropdown - Conditional based on "to" value */}
+                      {notification.to && (
+                        <select
+                          style={{
+                            padding: "5px 10px",
+                            border: "1px solid #ddd",
+                            borderRadius: "4px",
+                            fontSize: "13px",
+                            minWidth: "160px",
+                          }}
+                          value={notification.trigger}
+                          onChange={(e) => handleNotificationChange(notification.id, "trigger", e.target.value)}
+                        >
+                          <option value="" disabled>
+                            Select Trigger
+                          </option>
+                          {getTriggerOptions(notification.to).map((option) => (
+                            <option key={option} value={option}>
+                              {option}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                    </div>
+
+                    {/* Delete Button */}
+                    <div style={{ display: "flex", gap: "10px", marginLeft: "10px" }}>
+                      <button
+                        onClick={() => handleDeleteNotification(notification.id)}
+                        style={{
+                          width: "24px",
+                          height: "24px",
+                          border: "none",
+                          background: "#ff4757",
+                          color: "white",
+                          borderRadius: "4px",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "12px",
+                        }}
+                        title="Delete Notification"
+                      >
+                        🗑️
+                      </button>
+                    </div>
                   </div>
-                  <span
+                ))}
+
+                {/* Add Notification Button */}
+                {props.candidateNotifications.length < 3 && (
+                  <div
+                    onClick={handleAddNotification}
                     style={{
-                      fontSize: "14px",
-                      fontWeight: "500",
-                      color: "#333",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      marginTop: "15px",
+                      cursor: "pointer",
+                      padding: "10px",
+                      backgroundColor: "#ffffff",
+                      borderRadius: "6px",
+                      border: "2px dashed #007bff",
+                      transition: "all 0.2s ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = "#f8f9ff"
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = "#ffffff"
                     }}
                   >
-                    Add message
-                  </span>
-                </div>
+                    <div
+                      style={{
+                        width: "20px",
+                        height: "20px",
+                        borderRadius: "50%",
+                        backgroundColor: "#007bff",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "white",
+                        fontSize: "12px",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      +
+                    </div>
+                    <span
+                      style={{
+                        fontSize: "14px",
+                        fontWeight: "500",
+                        color: "#007bff",
+                      }}
+                    >
+                      Add Notification ({props.candidateNotifications.length}/3)
+                    </span>
+                  </div>
+                )}
+
+                {/* Max limit message */}
+                {props.candidateNotifications.length >= 3 && (
+                  <div
+                    style={{
+                      marginTop: "15px",
+                      padding: "10px",
+                      backgroundColor: "#fff3cd",
+                      border: "1px solid #ffeaa7",
+                      borderRadius: "4px",
+                      fontSize: "13px",
+                      color: "#856404",
+                      textAlign: "center",
+                    }}
+                  >
+                    Maximum of 3 notifications allowed
+                  </div>
+                )}
+
+                {/* No notifications message */}
+                {props.candidateNotifications.length === 0 && (
+                  <div
+                    style={{
+                      marginTop: "15px",
+                      padding: "20px",
+                      backgroundColor: "#f8f9fa",
+                      border: "1px solid #dee2e6",
+                      borderRadius: "4px",
+                      fontSize: "13px",
+                      color: "#6c757d",
+                      textAlign: "center",
+                    }}
+                  >
+                    No notifications configured. Click "Add Notification" to set up candidate notifications.
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -531,980 +466,90 @@ export default Step1
 
 
 
-"use client"
-import { useState, useEffect } from "react"
-import { FiSettings, FiTrash, FiX } from "react-icons/fi"
-import { GiPartyPopper } from "react-icons/gi"
-import { FaVideo, FaSpinner } from "react-icons/fa"
-import Swal from "sweetalert2"
-import withReactContent from "sweetalert2-react-content"
-import "./Step2.css"
-import { MdDragIndicator } from "react-icons/md"
 
-const MySwal = withReactContent(Swal)
 
-const Step2 = (props) => {
-  const [showSettingsPopup, setShowSettingsPopup] = useState(false)
-  const [currentQuestionSettings, setCurrentQuestionSettings] = useState(null)
-  const [questionSettings, setQuestionSettings] = useState({})
-  const [isPopupOpen, setIsPopupOpen] = useState(false)
-  const [previewCount, setPreviewCount] = useState(0)
-  const [draggedItem, setDraggedItem] = useState(null)
 
-  // Auto-save functionality
-  useEffect(() => {
-    const interviewData = {
-      interviewStartVideo: props.interviewStartVideo,
-      interviewStartTitle: props.interviewStartTitle,
-      interviewStartTag: props.interviewStartTag,
-      questions: props.questions,
-      farewell: props.farewell,
-    }
-    localStorage.setItem("interviewData", JSON.stringify(interviewData))
-  }, [props.interviewStartVideo, props.interviewStartTitle, props.interviewStartTag, props.questions, props.farewell])
 
-  // Load saved data on component mount
-  useEffect(() => {
-    const savedData = localStorage.getItem("interviewData")
-    if (savedData) {
-      const parsedData = JSON.parse(savedData)
-      if (parsedData.interviewStartTitle) props.setInterviewStartTitle(parsedData.interviewStartTitle)
-      if (parsedData.interviewStartTag) props.setInterviewStartTag(parsedData.interviewStartTag)
-      if (parsedData.questions) props.setQuestions(parsedData.questions)
-      if (parsedData.farewell) props.setFarewell(parsedData.farewell)
-    }
-  }, [])
 
-  const settingsOptions = {
-    Timetothink: [
-      { value: "30 seconds", label: "30 seconds" },
-      { value: "1 minute", label: "1 minute" },
-      { value: "2 minutes", label: "2 minutes" },
-      { value: "3 minutes", label: "3 minutes" },
-      { value: "4 minutes", label: "4 minutes" },
-      { value: "5 minutes", label: "5 minutes" },
-    ],
-    Timetoanswer: [
-      { value: "30 seconds", label: "30 seconds" },
-      { value: "1 minute", label: "1 minute" },
-      { value: "2 minutes", label: "2 minutes" },
-      { value: "3 minutes", label: "3 minutes" },
-      { value: "4 minutes", label: "4 minutes" },
-      { value: "5 minutes", label: "5 minutes" },
-    ],
-    Retakes: [
-      { value: "None", label: "None" },
-      { value: "1 Retake", label: "1 Retake" },
-      { value: "2 Retakes", label: "2 Retakes" },
-      { value: "3 Retakes", label: "3 Retakes" },
-      { value: "Unlimited", label: "Unlimited" },
-    ],
-  }
 
-  // File handling functions
-  const handleFileSelect = (callback, multiple = false) => {
-    const input = document.createElement("input")
-    input.type = "file"
-    input.accept = "video/*"
-    input.multiple = multiple
 
-    input.onchange = (e) => {
-      const files = e.target.files
-      if (files && files.length > 0) {
-        callback(files[0])
-      }
-    }
+const mongoose = require("mongoose")
 
-    input.click()
-  }
-
-  const handleDragOver = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    e.currentTarget.classList.add("drag-over")
-  }
-
-  const handleDragLeave = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    e.currentTarget.classList.remove("drag-over")
-  }
-
-  const handleDrop = (e, callback) => {
-    e.preventDefault()
-    e.stopPropagation()
-    e.currentTarget.classList.remove("drag-over")
-
-    const files = e.dataTransfer.files
-    if (files && files.length > 0) {
-      const file = files[0]
-      if (file.type.startsWith("video/")) {
-        callback(file)
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Invalid File Type",
-          text: "Please upload a video file.",
-        })
-      }
-    }
-  }
-
-  // Camera recording function
-  const recordVideo = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      const mediaRecorder = new MediaRecorder(stream)
-      const chunks = []
-
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) {
-          chunks.push(e.data)
-        }
-      }
-
-      const video = document.createElement("video")
-      video.srcObject = stream
-      video.autoplay = true
-      video.muted = true
-      video.style.width = "100%"
-      video.style.maxHeight = "300px"
-
-      return new Promise((resolve, reject) => {
-        MySwal.fire({
-          title: "Recording Video",
-          html: '<div id="video-container"></div>',
-          showCancelButton: true,
-          confirmButtonText: "Start Recording",
-          cancelButtonText: "Cancel",
-          didOpen: () => {
-            const container = document.getElementById("video-container")
-            if (container) {
-              container.appendChild(video)
-            }
-          },
-          preConfirm: () => {
-            mediaRecorder.start()
-            return new Promise((innerResolve) => {
-              MySwal.fire({
-                title: "Recording in Progress...",
-                html: '<div id="recording-container"></div>',
-                showCancelButton: false,
-                confirmButtonText: "Stop Recording",
-                allowOutsideClick: false,
-                didOpen: () => {
-                  const container = document.getElementById("recording-container")
-                  if (container) {
-                    const recordingVideo = video.cloneNode()
-                    recordingVideo.srcObject = stream
-                    recordingVideo.autoplay = true
-                    recordingVideo.muted = true
-                    container.appendChild(recordingVideo)
-                  }
-                },
-                preConfirm: () => {
-                  return new Promise((stopResolve) => {
-                    mediaRecorder.onstop = () => {
-                      const blob = new Blob(chunks, { type: "video/webm" })
-                      const file = new File([blob], "recorded-video.webm", { type: "video/webm" })
-                      stream.getTracks().forEach((track) => track.stop())
-                      stopResolve(file)
-                    }
-                    mediaRecorder.stop()
-                  })
-                },
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  innerResolve(result.value)
-                }
-              })
-            })
-          },
-        }).then((result) => {
-          if (result.isConfirmed) {
-            resolve(result.value)
-          } else {
-            stream.getTracks().forEach((track) => track.stop())
-            reject(new Error("Recording cancelled"))
-          }
-        })
-      })
-    } catch (error) {
-      console.error("Camera access error:", error)
-      throw new Error("Camera access denied or not available")
-    }
-  }
-
-  // Video upload handlers
-  const handleIntroVideoUpload = async (method = "upload") => {
-    try {
-      let file
-
-      if (method === "record") {
-        file = await recordVideo()
-      } else if (method === "upload") {
-        file = await new Promise((resolve) => {
-          handleFileSelect(resolve)
-        })
-      }
-
-      if (file) {
-        props.setInterviewStartVideo(file)
-      }
-    } catch (error) {
-      console.error("Error handling intro video:", error)
-      if (error.message !== "Recording cancelled") {
-        Swal.fire({
-          icon: "error",
-          title: "Upload Error",
-          text: error.message || "Failed to process video",
-        })
-      }
-    }
-  }
-
-  const handleQuestionVideoUpload = async (questionId, method = "upload") => {
-    const question = props.questions.find((q) => q.id === questionId)
-    if (!question.title || !question.description) {
-      Swal.fire({
-        icon: "warning",
-        title: "Missing Information",
-        text: "Please enter question title and description first.",
-      })
-      return
-    }
-
-    try {
-      let file
-
-      if (method === "record") {
-        file = await recordVideo()
-      } else if (method === "upload") {
-        file = await new Promise((resolve) => {
-          handleFileSelect(resolve)
-        })
-      }
-
-      if (file) {
-        const updatedQuestions = props.questions.map((q) => (q.id === questionId ? { ...q, video: file } : q))
-        props.setQuestions(updatedQuestions)
-      }
-    } catch (error) {
-      console.error("Error handling question video:", error)
-      if (error.message !== "Recording cancelled") {
-        Swal.fire({
-          icon: "error",
-          title: "Upload Error",
-          text: error.message || "Failed to process video",
-        })
-      }
-    }
-  }
-
-  const handleFarewellVideoUpload = async (farewellId, method = "upload") => {
-    const farewellItem = props.farewell.find((f) => f.id === farewellId)
-    if (!farewellItem.title || !farewellItem.description) {
-      Swal.fire({
-        icon: "warning",
-        title: "Missing Information",
-        text: "Please enter farewell title and description first.",
-      })
-      return
-    }
-
-    try {
-      let file
-
-      if (method === "record") {
-        file = await recordVideo()
-      } else if (method === "upload") {
-        file = await new Promise((resolve) => {
-          handleFileSelect(resolve)
-        })
-      }
-
-      if (file) {
-        const updatedFarewell = props.farewell.map((f) => (f.id === farewellId ? { ...f, video: file } : f))
-        props.setFarewell(updatedFarewell)
-      }
-    } catch (error) {
-      console.error("Error handling farewell video:", error)
-      if (error.message !== "Recording cancelled") {
-        Swal.fire({
-          icon: "error",
-          title: "Upload Error",
-          text: error.message || "Failed to process video",
-        })
-      }
-    }
-  }
-
-  // Question management
-  const handleAddQuestion = () => {
-    const newQuestion = {
-      id: props.questions.length + 1,
-      title: "",
-      description: "",
-      video: null,
-      Timetothink: props.candidateThinkingTime,
-      Timetoanswer: props.candidateMaxAnswerLength,
-      Retakes: props.answerRetakesAllowed,
-    }
-    props.setQuestions([...props.questions, newQuestion])
-  }
-
-  const handleRemoveQuestion = (id) => {
-    const updatedQuestions = props.questions.filter((q) => q.id !== id)
-    const renumberedQuestions = updatedQuestions.map((q, index) => ({
-      ...q,
-      id: index + 1,
-    }))
-    props.setQuestions(renumberedQuestions)
-  }
-
-  const handleAddFarewell = () => {
-    const newFarewell = {
-      id: 1,
-      title: "Interview Completed Successfully 😊",
-      description: "Thank you for completing the interview, we will get back to you shortly.",
-      video: null,
-    }
-    props.setFarewell([newFarewell])
-  }
-
-  const handleRemoveFarewell = () => {
-    props.setFarewell([])
-  }
-
-  // Settings management
-  const handleSettingsClick = (questionId) => {
-    setCurrentQuestionSettings(questionId)
-    setShowSettingsPopup(true)
-  }
-
-  const handleSettingsChange = (setting, value) => {
-    setQuestionSettings((prev) => ({
-      ...prev,
-      [currentQuestionSettings]: {
-        ...prev[currentQuestionSettings],
-        [setting]: value,
+// Define the Interview Schema
+const InterviewSchema = new mongoose.Schema(
+  {
+    interviewTitle: {
+      type: String,
+    },
+    candidateThinkingTime: {
+      type: String,
+    },
+    candidateMaxAnswerLength: {
+      type: String, // Length in seconds
+    },
+    brandingColorOrLogo: {
+      type: String,
+    },
+    answerRetakesAllowed: {
+      type: String, // Number of retakes allowed
+    },
+    // Updated field for dynamic candidate notifications
+    candidateNotifications: [
+      {
+        id: { type: Number, required: true }, // Unique identifier for each notification
+        method: { type: String, required: true, default: "Email" }, // Only Email for now
+        to: {
+          type: String,
+          required: true,
+          enum: ["Invitation", "Reminder", "Interview Completion"],
+        }, // Type of notification
+        trigger: { type: String, required: true }, // When to trigger the notification
+        createdAt: { type: Date, default: Date.now },
       },
-    }))
-  }
+    ],
+    interviewStart: {
+      video: { type: String }, // URL or path for the video
+      title: { type: String },
+      tag: { type: String },
+    },
+    questions: [
+      {
+        id: { type: Number, required: true },
+        video: { type: String }, // URL or path for the question video
+        title: { type: String },
+        description: { type: String },
+        Timetothink: { type: String }, // Time to think for this specific question
+        Timetoanswer: { type: String }, // Time to answer for this specific question
+        Retakes: { type: String }, // Number of retakes for this specific question
+      },
+    ],
+    farewell: {
+      id: { type: String },
+      video: { type: String }, // URL or path for the video
+      title: { type: String },
+      description: { type: String },
+    },
+    email: {
+      type: String,
+      required: true,
+    },
+    Status: {
+      type: String,
+    },
+  },
+  {
+    timestamps: true, // Automatically add createdAt and updatedAt timestamps
+  },
+)
 
-  const closeSettingsPopup = () => {
-    if (currentQuestionSettings) {
-      const updatedQuestions = props.questions.map((q) => {
-        if (q.id === currentQuestionSettings) {
-          const settings = questionSettings[currentQuestionSettings] || {}
-          return {
-            ...q,
-            Timetothink: settings.Timetothink || q.Timetothink,
-            Timetoanswer: settings.Timetoanswer || q.Timetoanswer,
-            Retakes: settings.Retakes || q.Retakes,
-          }
-        }
-        return q
-      })
-      props.setQuestions(updatedQuestions)
-    }
-    setShowSettingsPopup(false)
-    setCurrentQuestionSettings(null)
-  }
+module.exports = mongoose.model("Interview", InterviewSchema)
 
-  // Preview functionality
-  const createPreviewData = () => {
-    const previewItems = []
 
-    if (props.interviewStartVideo) {
-      previewItems.push({
-        type: "intro",
-        title: props.interviewStartTitle || "Welcome to the Interview",
-        description: "Please watch this introduction video before we begin.",
-        video: props.interviewStartVideo,
-      })
-    }
+schema
 
-    props.questions.forEach((question, index) => {
-      if (question.video) {
-        previewItems.push({
-          type: "question",
-          title: question.title || `Question ${index + 1}`,
-          description: question.description || "No description provided.",
-          video: question.video,
-          number: index + 1,
-        })
-      }
-    })
 
-    if (props.farewell.length > 0 && props.farewell[0].video) {
-      previewItems.push({
-        type: "farewell",
-        title: props.farewell[0].title || "Thank You!",
-        description: props.farewell[0].description || "Thank you for completing the interview.",
-        video: props.farewell[0].video,
-      })
-    }
 
-    return previewItems
-  }
 
-  const openPreview = () => {
-    const previewData = createPreviewData()
-    if (previewData.length === 0) {
-      Swal.fire({
-        icon: "warning",
-        title: "No Content to Preview",
-        text: "Please add at least one video to preview the interview.",
-      })
-      return
-    }
-    setPreviewCount(0)
-    setIsPopupOpen(true)
-  }
-
-  // Drag and drop for reordering questions
-  const handleQuestionDragStart = (e, questionId) => {
-    setDraggedItem(questionId)
-    e.dataTransfer.effectAllowed = "move"
-  }
-
-  const handleQuestionDragOver = (e) => {
-    e.preventDefault()
-    e.dataTransfer.dropEffect = "move"
-  }
-
-  const handleQuestionDrop = (e, targetId) => {
-    e.preventDefault()
-
-    if (draggedItem && draggedItem !== targetId) {
-      const draggedIndex = props.questions.findIndex((q) => q.id === draggedItem)
-      const targetIndex = props.questions.findIndex((q) => q.id === targetId)
-
-      const newQuestions = [...props.questions]
-      const [draggedQuestion] = newQuestions.splice(draggedIndex, 1)
-      newQuestions.splice(targetIndex, 0, draggedQuestion)
-
-      const renumberedQuestions = newQuestions.map((q, index) => ({
-        ...q,
-        id: index + 1,
-      }))
-
-      props.setQuestions(renumberedQuestions)
-    }
-    setDraggedItem(null)
-  }
-
-  // Get video preview URL
-  const getVideoPreviewUrl = (video) => {
-    if (!video) return null
-    if (typeof video === "string") return video
-    if (video instanceof File || video instanceof Blob) {
-      return URL.createObjectURL(video)
-    }
-    return null
-  }
-
-  return (
-    <div className="main-container">
-      <div className="content-wrapper">
-        <div className="back-button-container">
-          <button onClick={props.prevStep} className="back-button">
-            ← Back
-          </button>
-        </div>
-
-        <div className="interview-creation-container">
-          {/* Interview Starter Section */}
-          <div className="starter-section">
-            <div
-              className="video-upload-area"
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={(e) => handleDrop(e, (file) => props.setInterviewStartVideo(file))}
-              onClick={() => handleIntroVideoUpload("record")}
-            >
-              {props.interviewStartVideo && (
-                <div className="video-action-buttons">
-                  <div
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      props.setInterviewStartVideo(null)
-                    }}
-                    className="delete-video-button"
-                    title="Delete Video"
-                  >
-                    <FiTrash size={20} />
-                  </div>
-                </div>
-              )}
-
-              {props.interviewStartVideo ? (
-                <video src={getVideoPreviewUrl(props.interviewStartVideo)} controls className="preview-video" />
-              ) : (
-                <div className="upload-content">
-                  <FaVideo size={30} />
-                  <h3>Interview Starter</h3>
-                  <p>Click to record or drop video file here</p>
-                  <div className="upload-buttons">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleIntroVideoUpload("record")
-                      }}
-                    >
-                      Record Video
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleIntroVideoUpload("upload")
-                      }}
-                    >
-                      Upload Video
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="title-section">
-              <input
-                type="text"
-                placeholder="Enter your interview title here..."
-                className="interview-title-input"
-                value={props.interviewStartTitle}
-                onChange={(e) => props.setInterviewStartTitle(e.target.value)}
-              />
-            </div>
-          </div>
-
-          {/* Questions Section */}
-          {props.questions.map((question, index) => (
-            <div
-              key={question.id}
-              className="question-section"
-              draggable
-              onDragStart={(e) => handleQuestionDragStart(e, question.id)}
-              onDragOver={handleQuestionDragOver}
-              onDrop={(e) => handleQuestionDrop(e, question.id)}
-            >
-              <div>
-                <div className="number-circle">{index + 1}</div>
-              </div>
-              <div className="quesntioncomparter">
-                <div
-                  className="video-upload-area"
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={(e) =>
-                    handleDrop(e, (file) => {
-                      const updatedQuestions = props.questions.map((q) =>
-                        q.id === question.id ? { ...q, video: file } : q,
-                      )
-                      props.setQuestions(updatedQuestions)
-                    })
-                  }
-                  onClick={() => handleQuestionVideoUpload(question.id, "record")}
-                >
-                  {question.video && (
-                    <div className="video-action-buttons">
-                      <div
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          const updatedQuestions = props.questions.map((q) =>
-                            q.id === question.id ? { ...q, video: null } : q,
-                          )
-                          props.setQuestions(updatedQuestions)
-                        }}
-                        className="delete-video-button"
-                        title="Delete Video"
-                      >
-                        <FiTrash size={20} />
-                      </div>
-                    </div>
-                  )}
-
-                  {question.video ? (
-                    <video src={getVideoPreviewUrl(question.video)} controls className="preview-video" />
-                  ) : (
-                    <div className="upload-content">
-                      <FaVideo className="video-icon" />
-                      <h3>Question Video</h3>
-                      <p>Click to record or drop video file here</p>
-                      <div className="upload-buttons">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleQuestionVideoUpload(question.id, "record")
-                          }}
-                        >
-                          Record Video
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleQuestionVideoUpload(question.id, "upload")
-                          }}
-                        >
-                          Upload Video
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="question-content">
-                  <div className="input-fields">
-                    <div className="question-content-child1">
-                      <input
-                        type="text"
-                        placeholder="Question title here"
-                        value={question.title || ""}
-                        onChange={(e) => {
-                          const updatedQuestions = props.questions.map((q) =>
-                            q.id === question.id ? { ...q, title: e.target.value } : q,
-                          )
-                          props.setQuestions(updatedQuestions)
-                        }}
-                        className="question-input"
-                      />
-                      <textarea
-                        placeholder="Full question (max 1200 chars)"
-                        maxLength="1200"
-                        value={question.description || ""}
-                        onChange={(e) => {
-                          const updatedQuestions = props.questions.map((q) =>
-                            q.id === question.id ? { ...q, description: e.target.value } : q,
-                          )
-                          props.setQuestions(updatedQuestions)
-                        }}
-                        className="question-textarea"
-                      />
-                    </div>
-                    <div className="action-icons">
-                      <div className="icon-button settings-icon" onClick={() => handleSettingsClick(question.id)}>
-                        <FiSettings />
-                      </div>
-                      <div className="icon-button delete-icon" onClick={() => handleRemoveQuestion(question.id)}>
-                        <FiTrash />
-                      </div>
-                      <div
-                        className="icon-button delete-icon"
-                        onDragStart={(e) => handleQuestionDragStart(e, question.id)}
-                        onDragOver={handleQuestionDragOver}
-                        onDrop={(e) => handleQuestionDrop(e, question.id)}
-                      >
-                        <MdDragIndicator size={24} />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-
-          {/* Add Question/Farewell Buttons */}
-          <div className="button-container">
-            <button className="add-button" onClick={handleAddQuestion}>
-              + Add Question
-            </button>
-
-            {props.farewell.length === 0 && (
-              <button className="add-button farewell-button" onClick={handleAddFarewell}>
-                + Add Farewell Video & Message
-              </button>
-            )}
-          </div>
-
-          {/* Farewell Section */}
-          {props.farewell.map((farewellItem) => (
-            <div key={farewellItem.id} className="question-section farewell-section">
-              <div className="number-circle farewell-circle">
-                <GiPartyPopper />
-              </div>
-              <div className="quesntioncomparter">
-                <div
-                  className="video-upload-area"
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={(e) =>
-                    handleDrop(e, (file) => {
-                      const updatedFarewell = props.farewell.map((f) =>
-                        f.id === farewellItem.id ? { ...f, video: file } : f,
-                      )
-                      props.setFarewell(updatedFarewell)
-                    })
-                  }
-                  onClick={() => handleFarewellVideoUpload(farewellItem.id, "record")}
-                >
-                  {farewellItem.video && (
-                    <div className="video-action-buttons">
-                      <div
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          const updatedFarewell = props.farewell.map((f) =>
-                            f.id === farewellItem.id ? { ...f, video: null } : f,
-                          )
-                          props.setFarewell(updatedFarewell)
-                        }}
-                        className="delete-video-button"
-                        title="Delete Video"
-                      >
-                        <FiTrash size={20} />
-                      </div>
-                    </div>
-                  )}
-
-                  {farewellItem.video ? (
-                    <video src={getVideoPreviewUrl(farewellItem.video)} controls className="preview-video" />
-                  ) : (
-                    <div className="upload-content">
-                      <FaVideo className="video-icon" />
-                      <h3>Farewell Video</h3>
-                      <p>Click to record or drop video file here</p>
-                      <div className="upload-buttons">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleFarewellVideoUpload(farewellItem.id, "record")
-                          }}
-                        >
-                          Record Video
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleFarewellVideoUpload(farewellItem.id, "upload")
-                          }}
-                        >
-                          Upload Video
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="question-content">
-                  <div className="input-fields">
-                    <div className="question-content-child1">
-                      <input
-                        type="text"
-                        placeholder="Farewell title (max 40 chars)"
-                        maxLength="40"
-                        value={farewellItem.title}
-                        onChange={(e) => {
-                          const updatedFarewell = props.farewell.map((f) =>
-                            f.id === farewellItem.id ? { ...f, title: e.target.value } : f,
-                          )
-                          props.setFarewell(updatedFarewell)
-                        }}
-                        className="question-input"
-                      />
-                      <textarea
-                        placeholder="Farewell message (max 1200 chars)"
-                        maxLength="1200"
-                        value={farewellItem.description}
-                        onChange={(e) => {
-                          const updatedFarewell = props.farewell.map((f) =>
-                            f.id === farewellItem.id ? { ...f, description: e.target.value } : f,
-                          )
-                          props.setFarewell(updatedFarewell)
-                        }}
-                        className="question-textarea"
-                      />
-                    </div>
-                    <div className="action-icons">
-                      <div className="icon-button delete-icon" onClick={handleRemoveFarewell}>
-                        <FiTrash />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-
-          {/* Save Buttons */}
-          <div className="save-button-container">
-            <button onClick={openPreview} className="save-button" disabled={props.isUploading}>
-              Preview Interview
-            </button>
-            <button onClick={props.saveInterview} className="save-button" disabled={props.isUploading}>
-              {props.isUploading ? (
-                <>
-                  <FaSpinner className="spinner" /> Saving...
-                </>
-              ) : (
-                "Save Interview"
-              )}
-            </button>
-          </div>
-        </div>
-
-        {/* Preview Popup */}
-        {isPopupOpen && (
-          <div className="creatingsteppopup-vi-popup-overlay">
-            <div className="creatingsteppopup-vi-popup-container">
-              <div className="creatingsteppopup-vi-popup-close-button" onClick={() => setIsPopupOpen(false)}>
-                <FiX size={24} />
-              </div>
-
-              <div className="creatingsteppopup-vi-popup-content">
-                <div className="creatingsteppopup-vi-popup-video-section">
-                  <div className="creatingsteppopup-vi-popup-video-wrapper">
-                    <div className="creatingsteppopup-vi-popup-video-container">
-                      <video
-                        className="creatingsteppopup-vi-popup-video"
-                        src={getVideoPreviewUrl(createPreviewData()[previewCount]?.video)}
-                        controls
-                        autoPlay
-                      />
-                    </div>
-
-                    <div className="creatingsteppopup-vi-popup-progress">
-                      <div className="creatingsteppopup-vi-popup-progress-text">
-                        {previewCount + 1} / {createPreviewData().length}
-                      </div>
-                      <div className="creatingsteppopup-vi-popup-progress-bar">
-                        <div
-                          className="creatingsteppopup-vi-popup-progress-fill"
-                          style={{
-                            width: `${((previewCount + 1) / createPreviewData().length) * 100}%`,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="creatingsteppopup-vi-popup-info-section">
-                    <div className="creatingsteppopup-vi-popup-info-content">
-                      <div className="creatingsteppopup-vi-popup-badge">
-                        {createPreviewData()[previewCount]?.type === "intro" && "Introduction"}
-                        {createPreviewData()[previewCount]?.type === "question" &&
-                          `Question ${createPreviewData()[previewCount]?.number}`}
-                        {createPreviewData()[previewCount]?.type === "farewell" && "Farewell"}
-                      </div>
-
-                      <h1 className="creatingsteppopup-vi-popup-question-title">
-                        {createPreviewData()[previewCount]?.title}
-                      </h1>
-
-                      <div className="creatingsteppopup-vi-popup-divider" />
-
-                      <div className="creatingsteppopup-vi-popup-question-description">
-                        {createPreviewData()[previewCount]?.description}
-                      </div>
-
-                      <div className="creatingsteppopup-vi-popup-actions">
-                        {previewCount > 0 && (
-                          <button
-                            className="creatingsteppopup-vi-popup-prev-button"
-                            onClick={() => setPreviewCount(previewCount - 1)}
-                          >
-                            ← Previous
-                          </button>
-                        )}
-
-                        {previewCount < createPreviewData().length - 1 ? (
-                          <button
-                            className="creatingsteppopup-vi-popup-next-button"
-                            onClick={() => setPreviewCount(previewCount + 1)}
-                          >
-                            Next →
-                          </button>
-                        ) : (
-                          <button
-                            className="creatingsteppopup-vi-popup-next-button"
-                            onClick={() => setIsPopupOpen(false)}
-                          >
-                            Finish Preview
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Settings Popup */}
-        {showSettingsPopup && (
-          <div className="settings-popup-overlay">
-            <div className="settings-popup">
-              <div className="popup-header">
-                <h3>Question Settings</h3>
-                <div onClick={closeSettingsPopup} className="close-button">
-                  <FiX />
-                </div>
-              </div>
-
-              <div className="popup-content">
-                <div className="setting-group">
-                  <label>Time to think</label>
-                  <select
-                    value={questionSettings[currentQuestionSettings]?.Timetothink || ""}
-                    onChange={(e) => handleSettingsChange("Timetothink", e.target.value)}
-                    className="setting-select"
-                  >
-                    <option value="">Select Time to think</option>
-                    {settingsOptions.Timetothink.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="setting-group">
-                  <label>Time to answer</label>
-                  <select
-                    value={questionSettings[currentQuestionSettings]?.Timetoanswer || ""}
-                    onChange={(e) => handleSettingsChange("Timetoanswer", e.target.value)}
-                    className="setting-select"
-                  >
-                    <option value="">Select Time to answer</option>
-                    {settingsOptions.Timetoanswer.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="setting-group">
-                  <label>Retakes</label>
-                  <select
-                    value={questionSettings[currentQuestionSettings]?.Retakes || ""}
-                    onChange={(e) => handleSettingsChange("Retakes", e.target.value)}
-                    className="setting-select"
-                  >
-                    <option value="">Select Retakes</option>
-                    {settingsOptions.Retakes.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="popup-footer">
-                <button onClick={closeSettingsPopup} className="apply-button">
-                  Apply Settings
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}
-
-export default Step2
 
 
 
@@ -1534,27 +579,8 @@ const CreateInterview = () => {
   const [brandingColorOrLogo, setBrandingColorOrLogo] = useState("No")
   const [answerRetakesAllowed, setAnswerRetakesAllowed] = useState("Allowed")
 
-  // New state for candidate notifications
-  const [candidateNotifications, setCandidateNotifications] = useState({
-    invitation: {
-      method: "Email",
-      recipient: "Invitation",
-      timing: "On invitation",
-      enabled: true,
-    },
-    reminder: {
-      method: "Email",
-      recipient: "Reminder",
-      timing: "If no response in 24 hours",
-      enabled: true,
-    },
-    completion: {
-      method: "Email",
-      recipient: "Interview completed",
-      timing: "On interview completion",
-      enabled: true,
-    },
-  })
+  // Updated state for dynamic candidate notifications - starts as empty array
+  const [candidateNotifications, setCandidateNotifications] = useState([])
 
   // Step 2 Data
   const [interviewStartVideo, setInterviewStartVideo] = useState(null)
@@ -1635,11 +661,32 @@ const CreateInterview = () => {
 
   const moveToStepForward = () => {
     if (candidateThinkingTime && candidateMaxAnswerLength && brandingColorOrLogo && answerRetakesAllowed) {
+      // Validate notifications if any are added
+      if (candidateNotifications.length > 0) {
+        const incompleteNotifications = candidateNotifications.filter(
+          (notification) => !notification.to || !notification.trigger,
+        )
+
+        if (incompleteNotifications.length > 0) {
+          Swal.fire({
+            icon: "warning",
+            title: "Incomplete Notifications",
+            text: "Please complete all notification settings or remove incomplete ones.",
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+          })
+          return
+        }
+      }
+
       setStep(step + 1)
     } else {
       Swal.fire({
         icon: "warning",
-        title: "Please fill all the fields",
+        title: "Please fill all the required fields",
         toast: true,
         position: "top-end",
         showConfirmButton: false,
@@ -1716,6 +763,22 @@ const CreateInterview = () => {
       return
     }
 
+    // Validate notifications if any are added
+    if (candidateNotifications.length > 0) {
+      const incompleteNotifications = candidateNotifications.filter(
+        (notification) => !notification.to || !notification.trigger,
+      )
+
+      if (incompleteNotifications.length > 0) {
+        Swal.fire({
+          icon: "error",
+          title: "Incomplete Notifications",
+          text: "Please complete all notification settings or remove incomplete ones.",
+        })
+        return
+      }
+    }
+
     // Check if all questions have required fields
     const incompleteQuestions = questions.filter((q) => !q.title || !q.description || !q.video)
     if (incompleteQuestions.length > 0) {
@@ -1776,14 +839,14 @@ const CreateInterview = () => {
         },
       ]
 
-      // Prepare data for API
+      // Prepare data for API - only include notifications if user added any
       const interviewData = {
         interviewTitle: interviewStartTitle,
         candidateThinkingTime: candidateThinkingTime,
         candidateMaxAnswerLength: candidateMaxAnswerLength,
         brandingColorOrLogo: brandingColorOrLogo,
         answerRetakesAllowed: answerRetakesAllowed,
-        candidateNotifications: candidateNotifications, // Include notifications
+        candidateNotifications: candidateNotifications, // This will be empty array if no notifications added
         interviewStart: {
           video: introVideoUrl,
           title: interviewStartTitle,
@@ -1817,10 +880,14 @@ const CreateInterview = () => {
         Swal.fire({
           icon: "success",
           title: "Interview Created Successfully",
+          text:
+            candidateNotifications.length > 0
+              ? `Interview created with ${candidateNotifications.length} notification(s) configured.`
+              : "Interview created without notifications.",
           toast: true,
           position: "top-end",
           showConfirmButton: false,
-          timer: 3000,
+          timer: 4000,
           timerProgressBar: true,
         })
 
@@ -1829,7 +896,7 @@ const CreateInterview = () => {
 
         setTimeout(() => {
           navigate("/All-Interviews")
-        }, 3000)
+        }, 4000)
       } else {
         throw new Error("Failed to save interview to database")
       }
@@ -1901,6 +968,8 @@ export default CreateInterview
 
 
 
+
+
 const InterviewModel = require("../../Model/InterviewSchema/InterviewSchema")
 
 async function CreateInterview(req, res) {
@@ -1909,15 +978,46 @@ async function CreateInterview(req, res) {
 
     // 🔍 Log data in terminal (backend console)
     console.log("Frontend sent body:", body)
+    console.log("Candidate Notifications:", body.candidateNotifications)
+
+    // Validate notifications if any are provided
+    if (body.candidateNotifications && body.candidateNotifications.length > 0) {
+      // Check if all notifications have required fields
+      const invalidNotifications = body.candidateNotifications.filter(
+        (notification) => !notification.method || !notification.to || !notification.trigger,
+      )
+
+      if (invalidNotifications.length > 0) {
+        return res.status(400).json({
+          Message: "Invalid notification data",
+          error: "All notifications must have method, to, and trigger fields",
+        })
+      }
+
+      // Check maximum limit
+      if (body.candidateNotifications.length > 3) {
+        return res.status(400).json({
+          Message: "Too many notifications",
+          error: "Maximum of 3 notifications allowed",
+        })
+      }
+    }
 
     // Interview create karo
     const createdInterview = await InterviewModel.create(body)
 
+    // Log what was actually saved
+    console.log("Saved notifications:", createdInterview.candidateNotifications)
+
     // Frontend ko response do (yahan dena zaroori hai warna frontend hang ho jayega
-    return res.status(201).json({ Message: "Interview Created Successfully", createdInterview })
+    return res.status(201).json({
+      Message: "Interview Created Successfully",
+      createdInterview,
+      notificationCount: createdInterview.candidateNotifications?.length || 0,
+    })
   } catch (e) {
     console.error("Error:", e)
-    return res.status(500).json({ Message: "Server Problem" })
+    return res.status(500).json({ Message: "Server Problem", error: e.message })
   }
 }
 
@@ -2061,9 +1161,31 @@ async function UpdateInterview(req, res) {
     const { _id, ...updatedData } = req.body // Extract _id and the rest of the updated data
     console.log(_id, "id-updatedData")
     console.log(updatedData, "updatedData")
+
     // Validate ID and updated data
     if (!_id) {
       return res.status(400).json({ Message: "Interview ID is required" })
+    }
+
+    // Validate notifications if being updated
+    if (updatedData.candidateNotifications) {
+      if (updatedData.candidateNotifications.length > 3) {
+        return res.status(400).json({
+          Message: "Too many notifications",
+          error: "Maximum of 3 notifications allowed",
+        })
+      }
+
+      const invalidNotifications = updatedData.candidateNotifications.filter(
+        (notification) => !notification.method || !notification.to || !notification.trigger,
+      )
+
+      if (invalidNotifications.length > 0) {
+        return res.status(400).json({
+          Message: "Invalid notification data",
+          error: "All notifications must have method, to, and trigger fields",
+        })
+      }
     }
 
     // Update the interview by ID with the new data
@@ -2081,6 +1203,7 @@ async function UpdateInterview(req, res) {
     return res.status(200).json({
       Message: "Interview updated successfully",
       UpdatedInterview: updatedInterview, // Return the updated document
+      notificationCount: updatedInterview.candidateNotifications?.length || 0,
     })
   } catch (error) {
     console.error("Error updating interview:", error)
@@ -2088,15 +1211,15 @@ async function UpdateInterview(req, res) {
   }
 }
 
-// New function to handle notification sending
+// Updated function to handle dynamic notification sending
 async function SendCandidateNotification(req, res) {
   try {
-    const { interviewId, notificationType, candidateEmail, candidatePhone } = req.body
+    const { interviewId, candidateEmail, candidatePhone } = req.body
 
     // Validate required fields
-    if (!interviewId || !notificationType || !candidateEmail) {
+    if (!interviewId || !candidateEmail) {
       return res.status(400).json({
-        message: "Interview ID, notification type, and candidate email are required",
+        message: "Interview ID and candidate email are required",
       })
     }
 
@@ -2106,40 +1229,92 @@ async function SendCandidateNotification(req, res) {
       return res.status(404).json({ message: "Interview not found" })
     }
 
-    const notifications = interview.candidateNotifications
-    const notificationConfig = notifications[notificationType]
+    const notifications = interview.candidateNotifications || []
 
-    if (!notificationConfig || !notificationConfig.enabled) {
+    if (notifications.length === 0) {
       return res.status(400).json({
-        message: `${notificationType} notifications are not enabled for this interview`,
+        message: "No notifications configured for this interview",
       })
     }
 
-    // Here you would implement the actual email/SMS sending logic
-    // For now, we'll just log the notification details
-    console.log("Sending notification:", {
-      type: notificationType,
-      method: notificationConfig.method,
-      recipient: candidateEmail,
-      timing: notificationConfig.timing,
-      interviewTitle: interview.interviewTitle,
-    })
+    // Process each notification
+    const notificationResults = []
 
-    // Simulate notification sending
-    const notificationResult = {
-      sent: true,
-      method: notificationConfig.method,
-      recipient: candidateEmail,
-      timestamp: new Date(),
-      type: notificationType,
+    for (const notification of notifications) {
+      // Here you would implement the actual email/SMS sending logic
+      // For now, we'll just log the notification details
+      console.log("Sending notification:", {
+        type: notification.to,
+        method: notification.method,
+        recipient: candidateEmail,
+        trigger: notification.trigger,
+        interviewTitle: interview.interviewTitle,
+      })
+
+      // Simulate notification sending
+      const result = {
+        id: notification.id,
+        type: notification.to,
+        method: notification.method,
+        recipient: candidateEmail,
+        trigger: notification.trigger,
+        sent: true,
+        timestamp: new Date(),
+      }
+
+      notificationResults.push(result)
     }
 
     return res.status(200).json({
-      message: "Notification sent successfully",
-      notificationResult,
+      message: "Notifications sent successfully",
+      notificationResults,
+      totalSent: notificationResults.length,
     })
   } catch (error) {
-    console.error("Error sending notification:", error)
+    console.error("Error sending notifications:", error)
+    return res.status(500).json({
+      message: "Server problem",
+      error: error.message,
+    })
+  }
+}
+
+// New function to get notification statistics
+async function GetNotificationStats(req, res) {
+  try {
+    const stats = await InterviewModel.aggregate([
+      {
+        $project: {
+          email: 1,
+          interviewTitle: 1,
+          notificationCount: { $size: { $ifNull: ["$candidateNotifications", []] } },
+          notifications: "$candidateNotifications",
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalInterviews: { $sum: 1 },
+          interviewsWithNotifications: {
+            $sum: { $cond: [{ $gt: ["$notificationCount", 0] }, 1, 0] },
+          },
+          totalNotifications: { $sum: "$notificationCount" },
+          avgNotificationsPerInterview: { $avg: "$notificationCount" },
+        },
+      },
+    ])
+
+    return res.status(200).json({
+      message: "Notification statistics retrieved successfully",
+      stats: stats[0] || {
+        totalInterviews: 0,
+        interviewsWithNotifications: 0,
+        totalNotifications: 0,
+        avgNotificationsPerInterview: 0,
+      },
+    })
+  } catch (error) {
+    console.error("Error getting notification stats:", error)
     return res.status(500).json({
       message: "Server problem",
       error: error.message,
@@ -2157,91 +1332,8 @@ module.exports = {
   updateInterviewStatus,
   UpdateInterview,
   SendCandidateNotification,
+  GetNotificationStats,
 }
-
-
-
-
-
-
-
-const mongoose = require("mongoose")
-
-// Define the Interview Schema
-const InterviewSchema = new mongoose.Schema(
-  {
-    interviewTitle: {
-      type: String,
-    },
-    candidateThinkingTime: {
-      type: String,
-    },
-    candidateMaxAnswerLength: {
-      type: String, // Length in seconds
-    },
-    brandingColorOrLogo: {
-      type: String,
-    },
-    answerRetakesAllowed: {
-      type: String, // Number of retakes allowed
-    },
-    // New field for candidate notifications
-    candidateNotifications: {
-      invitation: {
-        method: { type: String, default: "Email" }, // Email, SMS, Both
-        recipient: { type: String, default: "Invitation" },
-        timing: { type: String, default: "On invitation" },
-        enabled: { type: Boolean, default: true },
-      },
-      reminder: {
-        method: { type: String, default: "Email" },
-        recipient: { type: String, default: "Reminder" },
-        timing: { type: String, default: "If no response in 24 hours" },
-        enabled: { type: Boolean, default: true },
-      },
-      completion: {
-        method: { type: String, default: "Email" },
-        recipient: { type: String, default: "Interview completed" },
-        timing: { type: String, default: "On interview completion" },
-        enabled: { type: Boolean, default: true },
-      },
-    },
-    interviewStart: {
-      video: { type: String }, // URL or path for the video
-      title: { type: String },
-      tag: { type: String },
-    },
-    questions: [
-      {
-        id: { type: Number, required: true },
-        video: { type: String }, // URL or path for the question video
-        title: { type: String },
-        description: { type: String },
-        Timetothink: { type: String }, // Time to think for this specific question
-        Timetoanswer: { type: String }, // Time to answer for this specific question
-        Retakes: { type: String }, // Number of retakes for this specific question
-      },
-    ],
-    farewell: {
-      id: { type: String },
-      video: { type: String }, // URL or path for the video
-      title: { type: String },
-      description: { type: String },
-    },
-    email: {
-      type: String,
-      required: true,
-    },
-    Status: {
-      type: String,
-    },
-  },
-  {
-    timestamps: true, // Automatically add createdAt and updatedAt timestamps
-  },
-)
-
-module.exports = mongoose.model("Interview", InterviewSchema)
 
 
 
@@ -2265,8 +1357,6 @@ Router.post("/GetInterviewsbyEmail", InterviewController.GetInterviewsbyEmail)
 Router.post("/updateInterviewStatus", InterviewController.updateInterviewStatus)
 Router.put("/UpdateInterview/:id", InterviewController.UpdateInterview)
 Router.post("/SendCandidateNotification", InterviewController.SendCandidateNotification)
+Router.get("/GetNotificationStats", InterviewController.GetNotificationStats)
 
 module.exports = Router
-
-
-
