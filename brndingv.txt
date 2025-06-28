@@ -114,6 +114,7 @@ export default function GiveInterview() {
   const [isAnswering, setIsAnswering] = useState(false)
   const [currentQuestion, setCurrentQuestion] = useState(null)
   const [retakesLeft, setRetakesLeft] = useState(0)
+  const [originalRetakesAllowed, setOriginalRetakesAllowed] = useState(0) // Store original retakes count
   const [questionStarted, setQuestionStarted] = useState(false)
   const [prepCountdown, setPrepCountdown] = useState(3)
   const [showPrepCountdown, setShowPrepCountdown] = useState(false)
@@ -318,12 +319,13 @@ export default function GiveInterview() {
             setAnswerTime(timing.answerSeconds)
             setOriginalAnswerTime(timing.answerSeconds) // Store original answer time
             setRetakesLeft(timing.retakesAllowed)
+            setOriginalRetakesAllowed(timing.retakesAllowed) // Store original retakes count
             setQuestionStarted(true)
             setIsThinking(false)
             setIsAnswering(false)
             setIsRecording(false)
 
-            console.log(`Question ${step} - Retakes allowed: ${timing.retakesAllowed}`) // Debug log
+            console.log(`Question ${step} - Original retakes allowed: ${timing.retakesAllowed}`) // Debug log
 
             // Auto-play video with enhanced handling
             setTimeout(() => {
@@ -390,25 +392,36 @@ export default function GiveInterview() {
     openCameraPopup()
   }, [originalAnswerTime])
 
-  // Fixed start answer timer with proper countdown
+  // FIXED: Enhanced start answer timer with proper countdown
   const startAnswerTimer = useCallback(() => {
-    // Ensure we have the correct answer time
-    const currentAnswerTime = answerTime > 0 ? answerTime : originalAnswerTime
+    console.log("Starting answer timer with time:", answerTime) // Debug log
 
-    if (currentAnswerTime > 0) {
+    // Use the current answerTime state
+    const timeToUse = answerTime > 0 ? answerTime : originalAnswerTime
+
+    if (timeToUse > 0) {
       setIsAnswering(true)
-      setAnswerTime(currentAnswerTime) // Set the correct answer time
 
+      // Ensure answerTime is set correctly
+      if (answerTime !== timeToUse) {
+        setAnswerTime(timeToUse)
+      }
+
+      // Clear any existing timer
       if (timerRef.current) {
         clearInterval(timerRef.current)
       }
 
+      console.log("Answer timer started with:", timeToUse, "seconds") // Debug log
+
       // Start countdown timer that updates every second
       timerRef.current = setInterval(() => {
         setAnswerTime((prev) => {
+          console.log("Answer time countdown:", prev) // Debug log
           if (prev <= 1) {
             clearInterval(timerRef.current)
             setIsAnswering(false)
+            console.log("Answer time expired, stopping recording") // Debug log
             if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
               mediaRecorderRef.current.stop()
             }
@@ -417,6 +430,8 @@ export default function GiveInterview() {
           return prev - 1
         })
       }, 1000)
+    } else {
+      console.warn("No answer time available to start timer") // Debug log
     }
   }, [answerTime, originalAnswerTime])
 
@@ -841,7 +856,7 @@ export default function GiveInterview() {
     }
   }, [showDeviceModal])
 
-  // Fixed camera and recording functionality
+  // FIXED: Enhanced camera and recording functionality with proper answer timer
   const openCameraPopup = useCallback(async () => {
     if (isRecording) return
 
@@ -852,6 +867,12 @@ export default function GiveInterview() {
       // Pause the video when recording starts
       if (videoRef.current) {
         videoRef.current.pause()
+      }
+
+      // FIXED: Ensure answer time is properly set before recording
+      if (answerTime <= 0) {
+        console.log("Resetting answer time to original:", originalAnswerTime)
+        setAnswerTime(originalAnswerTime)
       }
 
       const constraints = {
@@ -907,7 +928,8 @@ export default function GiveInterview() {
       }
 
       mediaRecorder.onstart = () => {
-        console.log("Recording started.")
+        console.log("Recording started, starting answer timer")
+        // FIXED: Start answer timer immediately when recording starts
         startAnswerTimer()
       }
 
@@ -936,12 +958,15 @@ export default function GiveInterview() {
                 setIsAnswering(false)
               }
 
-              // Check if retakes are available - FIXED for all questions including first
-              console.log(`Retakes left for question ${step}: ${retakesLeft}`) // Debug log
+              // FIXED: Enhanced retakes logic - prevent negative retakes
+              console.log(`Current retakes left: ${retakesLeft}`) // Debug log
+
               if (retakesLeft > 0) {
+                console.log("Showing retake modal")
                 setShowRetakeModal(true)
               } else {
-                // No retakes, save and continue
+                console.log("No retakes left, auto-submitting and continuing")
+                // No retakes left, automatically save and continue
                 saveAnswerAndContinue(cloudinaryUrl)
               }
             }
@@ -988,7 +1013,7 @@ export default function GiveInterview() {
       })
       setIsRecording(false)
     }
-  }, [isRecording, selectedDevices, startAnswerTimer, showAlert, step, retakesLeft])
+  }, [isRecording, selectedDevices, startAnswerTimer, showAlert, step, retakesLeft, answerTime, originalAnswerTime])
 
   // Update recording video ref when stream changes
   useEffect(() => {
@@ -1016,14 +1041,31 @@ export default function GiveInterview() {
     [step, showAlert],
   )
 
-  // Handle retake decision - FIXED
+  // FIXED: Enhanced retake decision handling with proper validation
   const handleRetakeDecision = useCallback(
     (shouldRetake) => {
       setShowRetakeModal(false)
 
       if (shouldRetake) {
+        // FIXED: Validate retakes before allowing retake
+        if (retakesLeft <= 0) {
+          console.log("No retakes left, cannot retake")
+          showAlert({
+            type: "warning",
+            title: "No Retakes Left",
+            message: "You have exhausted all retakes for this question.",
+            autoClose: 2000,
+          })
+          // Auto-submit the current recorded video
+          saveAnswerAndContinue(currentRecordedVideo)
+          return
+        }
+
+        console.log(`Using retake, ${retakesLeft} left, decreasing to ${retakesLeft - 1}`)
+
         // Decrease retakes and restart question
-        setRetakesLeft((prev) => prev - 1)
+        setRetakesLeft((prev) => Math.max(0, prev - 1)) // Prevent negative values
+
         // Reset question state
         setIsThinking(false)
         setIsAnswering(false)
@@ -1070,10 +1112,12 @@ export default function GiveInterview() {
         }, 500)
       } else {
         // Continue to next question
+        console.log("User chose to continue to next question")
         saveAnswerAndContinue(currentRecordedVideo)
       }
     },
     [
+      retakesLeft,
       currentRecordedVideo,
       saveAnswerAndContinue,
       currentQuestion,
@@ -1081,6 +1125,7 @@ export default function GiveInterview() {
       InterviewId,
       getQuestionTiming,
       openCameraPopup,
+      showAlert,
     ],
   )
 
@@ -1651,13 +1696,16 @@ export default function GiveInterview() {
                   <CheckCircle className="w-5 h-5 mr-2" />
                   Continue
                 </button>
-                <button
-                  onClick={() => handleRetakeDecision(true)}
-                  className="flex-1 py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl transition-all duration-200 flex items-center justify-center"
-                >
-                  <RefreshCw className="w-5 h-5 mr-2" />
-                  Retake
-                </button>
+                {/* FIXED: Only show retake button if retakes are available */}
+                {retakesLeft > 0 && (
+                  <button
+                    onClick={() => handleRetakeDecision(true)}
+                    className="flex-1 py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl transition-all duration-200 flex items-center justify-center"
+                  >
+                    <RefreshCw className="w-5 h-5 mr-2" />
+                    Retake
+                  </button>
+                )}
               </div>
             </div>
           </div>
