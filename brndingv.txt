@@ -109,6 +109,7 @@ export default function GiveInterview() {
   const [isCountingDown, setIsCountingDown] = useState(false)
   const [thinkingTime, setThinkingTime] = useState(0)
   const [answerTime, setAnswerTime] = useState(0)
+  const [originalAnswerTime, setOriginalAnswerTime] = useState(0) // Store original answer time
   const [isThinking, setIsThinking] = useState(false)
   const [isAnswering, setIsAnswering] = useState(false)
   const [currentQuestion, setCurrentQuestion] = useState(null)
@@ -315,11 +316,14 @@ export default function GiveInterview() {
             setCurrentQuestion(questionData)
             setThinkingTime(timing.thinkingSeconds)
             setAnswerTime(timing.answerSeconds)
+            setOriginalAnswerTime(timing.answerSeconds) // Store original answer time
             setRetakesLeft(timing.retakesAllowed)
             setQuestionStarted(true)
             setIsThinking(false)
             setIsAnswering(false)
             setIsRecording(false)
+
+            console.log(`Question ${step} - Retakes allowed: ${timing.retakesAllowed}`) // Debug log
 
             // Auto-play video with enhanced handling
             setTimeout(() => {
@@ -367,7 +371,7 @@ export default function GiveInterview() {
     }
   }, [step, Interview, InterviewId, QuesionLength, getQuestionTiming, autoPlayVideo])
 
-  // Handle early recording (during thinking time)
+  // Handle early recording (during thinking time) - FIXED
   const handleEarlyRecording = useCallback(() => {
     // Clear thinking timer
     if (thinkingTimerRef.current) {
@@ -379,14 +383,22 @@ export default function GiveInterview() {
     setIsThinking(false)
     setThinkingTime(0)
 
+    // Reset answer time to original value for proper countdown
+    setAnswerTime(originalAnswerTime)
+
     // Start recording immediately
     openCameraPopup()
-  }, [])
+  }, [originalAnswerTime])
 
   // Fixed start answer timer with proper countdown
   const startAnswerTimer = useCallback(() => {
-    if (answerTime > 0) {
+    // Ensure we have the correct answer time
+    const currentAnswerTime = answerTime > 0 ? answerTime : originalAnswerTime
+
+    if (currentAnswerTime > 0) {
       setIsAnswering(true)
+      setAnswerTime(currentAnswerTime) // Set the correct answer time
+
       if (timerRef.current) {
         clearInterval(timerRef.current)
       }
@@ -406,7 +418,7 @@ export default function GiveInterview() {
         })
       }, 1000)
     }
-  }, [answerTime])
+  }, [answerTime, originalAnswerTime])
 
   // Clean up timers
   useEffect(() => {
@@ -924,7 +936,8 @@ export default function GiveInterview() {
                 setIsAnswering(false)
               }
 
-              // Check if retakes are available
+              // Check if retakes are available - FIXED for all questions including first
+              console.log(`Retakes left for question ${step}: ${retakesLeft}`) // Debug log
               if (retakesLeft > 0) {
                 setShowRetakeModal(true)
               } else {
@@ -1003,7 +1016,7 @@ export default function GiveInterview() {
     [step, showAlert],
   )
 
-  // Handle retake decision
+  // Handle retake decision - FIXED
   const handleRetakeDecision = useCallback(
     (shouldRetake) => {
       setShowRetakeModal(false)
@@ -1027,13 +1040,14 @@ export default function GiveInterview() {
                 setIsCountingDown(false)
                 setIsThinking(true)
 
-                // Reset thinking time
+                // Reset thinking time and answer time to original values
                 const timing = getQuestionTiming(
                   currentQuestion,
                   Interview.find((i) => i._id === InterviewId),
                 )
                 setThinkingTime(timing.thinkingSeconds)
                 setAnswerTime(timing.answerSeconds)
+                setOriginalAnswerTime(timing.answerSeconds) // Reset original answer time
 
                 // Start thinking timer
                 thinkingTimerRef.current = setInterval(() => {
